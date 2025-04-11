@@ -1,9 +1,12 @@
 <?php
+<?php
 /**
- * Plugin Name: Tables Manager
- * Description: Manage tables with full CRUD, search, sort, pagination, and textarea notes.
- * Version: 1.6
- * Author: YOU
+ * Plugin Name: Custom Table CRUD
+ * Description: Manage custom database tables in WordPress using a flexible CRUD shortcode system with search, pagination, and editing.
+ * Version: 1.0
+ * Author: affigabmag
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
  //example:

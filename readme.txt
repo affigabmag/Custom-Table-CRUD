@@ -1,12 +1,12 @@
-=== WP Table Manager ===
-Contributors: yourusername
+=== Custom Table CRUD ===
+Contributors: affigabmag
 Tags: tables, custom tables, database, admin ui, shortcode, wordpress plugin
 Requires at least: 5.0
-Tested up to: 6.5
+Tested up to: 6.7
 Requires PHP: 7.4
 Stable tag: 1.0
-License: MIT
-License URI: https://opensource.org/licenses/MIT
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 A flexible shortcode-based plugin that lets you manage custom WordPress database tables from the frontend. This plugin supports adding, editing, deleting, searching, sorting, and pagination for any table you define. Note: the plugin does not create database tables — you must create them manually.
 
