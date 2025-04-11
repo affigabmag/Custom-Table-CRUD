@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WP Books Manager
+ * Plugin Name: WP Tables Manager
  * Description: Manage wp_books and wp_warranties with full CRUD, search, sort, pagination, and textarea notes.
  * Version: 1.6
  * Author: YOU
