@@ -1,5 +1,4 @@
 <?php
-<?php
 /**
  * Plugin Name: Custom Table CRUD
  * Description: Manage custom database tables in WordPress using a flexible CRUD shortcode system with search, pagination, and editing.
@@ -17,10 +16,11 @@ add_shortcode('wp_warranties_manager', 'wp_warranties_manager_shortcode');
 function wp_books_manager_shortcode() {
     global $wpdb;
     return generic_table_manager_shortcode([
-        'table_name'  => $wpdb->prefix . 'books',
+        //'table_name'  => $wpdb->prefix . 'books',
+        'table_name'  => 'app_books',
         'primary_key' => 'id',
         'columns'     => [
-            'name'        => 'Book Name',
+            'bookname'        => 'Book Name',
             'price'       => 'Price',
             'description' => 'Description'
         ]
@@ -30,7 +30,7 @@ function wp_books_manager_shortcode() {
 function wp_warranties_manager_shortcode() {
     global $wpdb;
     return generic_table_manager_shortcode([
-        'table_name'  => $wpdb->prefix . 'warranties',
+        'table_name'  => 'app_warranties',
         'primary_key' => 'id',
         'columns'     => [
             'ProductName'     => 'Product Name',
