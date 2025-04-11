@@ -1,4 +1,4 @@
-# WP Table Manager Plugin
+# Custom Table CRUD Plugin
 
 A lightweight and flexible **WordPress plugin** for managing **custom database tables** with a front-end UI.  
 Supports **Add, Edit, Delete, Search, Sort, Pagination** and works with **any table** you define.
