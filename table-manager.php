@@ -1,14 +1,16 @@
 <?php
 /**
- * Plugin Name: WP Tables Manager
- * Description: Manage wp_books and wp_warranties with full CRUD, search, sort, pagination, and textarea notes.
+ * Plugin Name: Tables Manager
+ * Description: Manage tables with full CRUD, search, sort, pagination, and textarea notes.
  * Version: 1.6
  * Author: YOU
  */
 
+ //example:
 add_shortcode('wp_books_manager', 'wp_books_manager_shortcode');
 add_shortcode('wp_warranties_manager', 'wp_warranties_manager_shortcode');
 
+//init with table data
 function wp_books_manager_shortcode() {
     global $wpdb;
     return generic_table_manager_shortcode([
