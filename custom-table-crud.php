@@ -4,6 +4,10 @@
  * Description: CRUD for custom DB tables with working pagination inside shortcodes.
  * Version: 1.5
  * Author: affigabmag
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: custom-crud
+ * Stable tag: 1.5
  */
 
 // Register the shortcode on init to allow dynamic attributes
@@ -59,7 +63,7 @@ function handle_wp_table_manager_shortcode($atts = []) {
     file_put_contents($log_file, $log_data, FILE_APPEND);
 
     if (empty($columns)) {
-        return '<div style="color:red;">⚠️ No valid fields defined in shortcode.</div>';
+        return '<div style="color:red;">⚠️ ' . esc_html__('No valid fields defined in shortcode.', 'custom-crud') . '</div>';
     }
 
     return generic_table_manager_shortcode([
@@ -86,15 +90,15 @@ function custom_crud_dashboard_page() {
     $tables = $wpdb->get_col("SHOW TABLES");
 
     echo '<div class="wrap">';
-    echo '<h1>Custom Crud - Dashboard</h1>';
-    echo '<p>Welcome to your custom CRUD dashboard.</p>';
+    echo '<h1>' . esc_html__('Custom Crud - Dashboard', 'custom-crud') . '</h1>';
+    echo '<p>' . esc_html__('Welcome to your custom CRUD dashboard.', 'custom-crud') . '</p>';
 
     echo '<form method="post" onsubmit="generateShortcode(); return false;">';
     wp_nonce_field('custom_crud_form', 'custom_crud_nonce');
 
-    echo '<label for="table_view"><strong>Select Table:</strong></label><br>';
+    echo '<label for="table_view"><strong>' . esc_html__('Select Table:', 'custom-crud') . '</strong></label><br>';
     echo '<select id="table_view" name="table_view" style="width: 300px;" onchange="loadFields(this.value)">';
-    echo '<option value="">-- Select Table --</option>';
+    echo '<option value="">' . esc_html__('-- Select Table --', 'custom-crud') . '</option>';
     foreach ($tables as $table) {
         echo '<option value="' . esc_attr($table) . '">' . esc_html($table) . '</option>';
     }
@@ -102,15 +106,15 @@ function custom_crud_dashboard_page() {
 
     echo '<div id="field_select_container"></div>';
 
-    echo '<br><label for="pagination"><strong>Pagination:</strong></label><br>';
+    echo '<br><label for="pagination"><strong>' . esc_html__('Pagination:', 'custom-crud') . '</strong></label><br>';
     echo '<input type="number" id="pagination" name="pagination" value="5" style="width: 100px;"><br><br>';
 
     echo '<div style="display: flex; align-items: center; gap: 10px;">';
-    echo '<button type="submit" class="button button-primary">Generate Shortcode</button>';
-    echo '<span id="copy-message" style="color:green;display:none;">Copied to clipboard!</span>';
+    echo '<button type="submit" class="button button-primary">' . esc_html__('Generate Shortcode', 'custom-crud') . '</button>';
+    echo '<span id="copy-message" style="color:green;display:none;">' . esc_html__('Copied to clipboard!', 'custom-crud') . '</span>';
     echo '</div><br><br>';
 
-    echo '<h2>Generated Shortcode</h2>';
+    echo '<h2>' . esc_html__('Generated Shortcode', 'custom-crud') . '</h2>';
     echo '<textarea id="shortcode_output" style="width:100%;height:120px;"></textarea>';
 
     echo '</form>';
@@ -172,8 +176,9 @@ add_action('wp_ajax_get_table_fields', function() {
         wp_die();
     }
     
-    // Use prepared statement for security
-    $columns = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM %i", $table));
+    // For SHOW COLUMNS, we need to use esc_sql because %i doesn't work with SHOW COLUMNS
+    $table_name = esc_sql($table);
+    $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
     
     if (!$columns) {
         wp_die();
@@ -188,8 +193,8 @@ add_action('wp_ajax_get_table_fields', function() {
 
         echo '<div class="field-wrapper" style="margin-bottom:8px;">';
         echo '<label><input type="checkbox" class="field-checkbox" value="' . esc_attr($name) . '" checked> ' . esc_html($name) . '</label><br>';
-        echo 'Display Name: <input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" style="width:150px;"> ';
-        echo 'Type: <select name="type_' . esc_attr($name) . '">' ;
+        echo esc_html__('Display Name:', 'custom-crud') . ' <input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" style="width:150px;"> ';
+        echo esc_html__('Type:', 'custom-crud') . ' <select name="type_' . esc_attr($name) . '">' ;
         $types = ['text','number','date','datetime','textarea','email','url','tel','password'];
         foreach ($types as $t) {
             echo '<option value="' . esc_attr($t) . '"' . ($type == $t ? ' selected' : '') . '>' . esc_html($t) . '</option>';
@@ -240,6 +245,7 @@ function generic_table_manager_shortcode($config) {
     $per_page    = isset($config['pagination']) && intval($config['pagination']) > 0 ? intval($config['pagination']) : 5;
     $editing     = false;
     $edit_data   = null;
+    $error_message = '';
 
     // Process delete action with nonce verification
     if (isset($_GET['delete_record'], $_GET['_wpnonce'])) {
@@ -293,7 +299,7 @@ function generic_table_manager_shortcode($config) {
         $record_id = intval($_GET['edit_record']);
         if (wp_verify_nonce($_GET['_wpnonce'], 'edit_record_' . $record_id)) {
             $editing = true;
-            $edit_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE $primary_key = %d", $record_id));
+            $edit_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM " . esc_sql($table_name) . " WHERE " . esc_sql($primary_key) . " = %d", $record_id));
         }
     }
 
@@ -307,9 +313,11 @@ function generic_table_manager_shortcode($config) {
 
     if ($search_term) {
         foreach (array_keys($columns) as $col) {
-            $search_clauses[] = $wpdb->prepare("$col LIKE %s", '%' . $wpdb->esc_like($search_term) . '%');
+            $search_clauses[] = $wpdb->prepare(esc_sql($col) . " LIKE %s", '%' . $wpdb->esc_like($search_term) . '%');
         }
-        $query .= " WHERE " . implode(' OR ', $search_clauses);
+        if (!empty($search_clauses)) {
+            $query .= " WHERE " . implode(' OR ', $search_clauses);
+        }
     }
     
     $query .= " ORDER BY " . esc_sql($order_by) . " " . esc_sql($order_dir);
@@ -335,14 +343,14 @@ function generic_table_manager_shortcode($config) {
 
     if (isset($_GET['added'])) echo '<p style="color:green;">✅ ' . esc_html__('Record added successfully!', 'custom-crud') . '</p>';
     if (isset($_GET['updated'])) echo '<p style="color:green;">✅ ' . esc_html__('Record updated successfully!', 'custom-crud') . '</p>';
-    if (isset($error_message)) echo $error_message;
+    if (!empty($error_message)) echo $error_message;
 
     if ($editing && $edit_data) echo '<input type="hidden" name="record_id" value="' . esc_attr($edit_data->$primary_key) . '">';
 
     foreach ($columns as $field => $meta) {
         $label = $meta['label'];
         $type  = $meta['type'];
-        $value = $_POST[$field] ?? ($editing && isset($edit_data->$field) ? $edit_data->$field : '');
+        $value = isset($_POST[$field]) ? $_POST[$field] : ($editing && isset($edit_data->$field) ? $edit_data->$field : '');
         $error = isset($_POST['form_type'], $_POST[$field]) && trim($_POST[$field]) === '';
 
         echo '<p><label>' . esc_html($label) . ':</label><br>';
