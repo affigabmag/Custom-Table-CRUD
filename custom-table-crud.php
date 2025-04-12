@@ -6,7 +6,7 @@
  * Author: affigabmag
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: custom-crud
+ * Text Domain: custom-table-crud
  * Stable tag: 1.5
  */
 
@@ -63,7 +63,7 @@ function handle_wp_table_manager_shortcode($atts = []) {
     file_put_contents($log_file, $log_data, FILE_APPEND);
 
     if (empty($columns)) {
-        return '<div style="color:red;">⚠️ ' . esc_html__('No valid fields defined in shortcode.', 'custom-crud') . '</div>';
+        return '<div style="color:red;">⚠️ ' . esc_html__('No valid fields defined in shortcode.', 'custom-table-crud') . '</div>';
     }
 
     return generic_table_manager_shortcode([
@@ -90,15 +90,15 @@ function custom_crud_dashboard_page() {
     $tables = $wpdb->get_col("SHOW TABLES");
 
     echo '<div class="wrap">';
-    echo '<h1>' . esc_html__('Custom Crud - Dashboard', 'custom-crud') . '</h1>';
-    echo '<p>' . esc_html__('Welcome to your custom CRUD dashboard.', 'custom-crud') . '</p>';
+    echo '<h1>' . esc_html__('Custom Crud - Dashboard', 'custom-table-crud') . '</h1>';
+    echo '<p>' . esc_html__('Welcome to your custom CRUD dashboard.', 'custom-table-crud') . '</p>';
 
     echo '<form method="post" onsubmit="generateShortcode(); return false;">';
     wp_nonce_field('custom_crud_form', 'custom_crud_nonce');
 
-    echo '<label for="table_view"><strong>' . esc_html__('Select Table:', 'custom-crud') . '</strong></label><br>';
+    echo '<label for="table_view"><strong>' . esc_html__('Select Table:', 'custom-table-crud') . '</strong></label><br>';
     echo '<select id="table_view" name="table_view" style="width: 300px;" onchange="loadFields(this.value)">';
-    echo '<option value="">' . esc_html__('-- Select Table --', 'custom-crud') . '</option>';
+    echo '<option value="">' . esc_html__('-- Select Table --', 'custom-table-crud') . '</option>';
     foreach ($tables as $table) {
         echo '<option value="' . esc_attr($table) . '">' . esc_html($table) . '</option>';
     }
@@ -106,15 +106,15 @@ function custom_crud_dashboard_page() {
 
     echo '<div id="field_select_container"></div>';
 
-    echo '<br><label for="pagination"><strong>' . esc_html__('Pagination:', 'custom-crud') . '</strong></label><br>';
+    echo '<br><label for="pagination"><strong>' . esc_html__('Pagination:', 'custom-table-crud') . '</strong></label><br>';
     echo '<input type="number" id="pagination" name="pagination" value="5" style="width: 100px;"><br><br>';
 
     echo '<div style="display: flex; align-items: center; gap: 10px;">';
-    echo '<button type="submit" class="button button-primary">' . esc_html__('Generate Shortcode', 'custom-crud') . '</button>';
-    echo '<span id="copy-message" style="color:green;display:none;">' . esc_html__('Copied to clipboard!', 'custom-crud') . '</span>';
+    echo '<button type="submit" class="button button-primary">' . esc_html__('Generate Shortcode', 'custom-table-crud') . '</button>';
+    echo '<span id="copy-message" style="color:green;display:none;">' . esc_html__('Copied to clipboard!', 'custom-table-crud') . '</span>';
     echo '</div><br><br>';
 
-    echo '<h2>' . esc_html__('Generated Shortcode', 'custom-crud') . '</h2>';
+    echo '<h2>' . esc_html__('Generated Shortcode', 'custom-table-crud') . '</h2>';
     echo '<textarea id="shortcode_output" style="width:100%;height:120px;"></textarea>';
 
     echo '</form>';
@@ -193,8 +193,8 @@ add_action('wp_ajax_get_table_fields', function() {
 
         echo '<div class="field-wrapper" style="margin-bottom:8px;">';
         echo '<label><input type="checkbox" class="field-checkbox" value="' . esc_attr($name) . '" checked> ' . esc_html($name) . '</label><br>';
-        echo esc_html__('Display Name:', 'custom-crud') . ' <input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" style="width:150px;"> ';
-        echo esc_html__('Type:', 'custom-crud') . ' <select name="type_' . esc_attr($name) . '">' ;
+        echo esc_html__('Display Name:', 'custom-table-crud') . ' <input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" style="width:150px;"> ';
+        echo esc_html__('Type:', 'custom-table-crud') . ' <select name="type_' . esc_attr($name) . '">' ;
         $types = ['text','number','date','datetime','textarea','email','url','tel','password'];
         foreach ($types as $t) {
             echo '<option value="' . esc_attr($t) . '"' . ($type == $t ? ' selected' : '') . '>' . esc_html($t) . '</option>';
@@ -210,8 +210,8 @@ function render_table_row($row, $columns, $primary_key) {
     foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
         $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
     }
-    $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">' . esc_html__('Edit', 'custom-crud') . '</a> | ';
-    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'' . esc_js(__('Are you sure?', 'custom-crud')) . '\');">' . esc_html__('Delete', 'custom-crud') . '</a></td>';
+    $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">' . esc_html__('Edit', 'custom-table-crud') . '</a> | ';
+    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'' . esc_js(__('Are you sure?', 'custom-table-crud')) . '\');">' . esc_html__('Delete', 'custom-table-crud') . '</a></td>';
     $output .= '</tr>';
     return $output;
 }
@@ -223,13 +223,13 @@ function render_pagination_controls($page, $total, $per_page) {
     $output .= wp_nonce_field('pagination_nonce', 'pagination_nonce', true, false);
 
     if ($page > 1) {
-        $output .= '<button type="submit" name="paged" value="' . esc_attr($page - 1) . '">&laquo; ' . esc_html__('Prev', 'custom-crud') . '</button> ';
+        $output .= '<button type="submit" name="paged" value="' . esc_attr($page - 1) . '">&laquo; ' . esc_html__('Prev', 'custom-table-crud') . '</button> ';
     }
 
-    $output .= esc_html__('Page', 'custom-crud') . ' ' . esc_html($page) . ' ' . esc_html__('of', 'custom-crud') . ' ' . esc_html($total_pages) . ' ';
+    $output .= esc_html__('Page', 'custom-table-crud') . ' ' . esc_html($page) . ' ' . esc_html__('of', 'custom-table-crud') . ' ' . esc_html($total_pages) . ' ';
 
     if ($page < $total_pages) {
-        $output .= '<button type="submit" name="paged" value="' . esc_attr($page + 1) . '">' . esc_html__('Next', 'custom-crud') . ' &raquo;</button>';
+        $output .= '<button type="submit" name="paged" value="' . esc_attr($page + 1) . '">' . esc_html__('Next', 'custom-table-crud') . ' &raquo;</button>';
     }
 
     $output .= '</form>';
@@ -276,7 +276,7 @@ function generic_table_manager_shortcode($config) {
             }
 
             if ($has_error) {
-                $error_message = '<p style="color:red;">⚠️ ' . esc_html__('All fields are required.', 'custom-crud') . '</p>';
+                $error_message = '<p style="color:red;">⚠️ ' . esc_html__('All fields are required.', 'custom-table-crud') . '</p>';
             } else {
                 if (isset($_POST['update_record'])) {
                     $record_id = intval($_POST['record_id']);
@@ -341,8 +341,8 @@ function generic_table_manager_shortcode($config) {
     .wp-books-table th, .wp-books-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     .wp-books-table th { background: #f0f0f0; }</style>';
 
-    if (isset($_GET['added'])) echo '<p style="color:green;">✅ ' . esc_html__('Record added successfully!', 'custom-crud') . '</p>';
-    if (isset($_GET['updated'])) echo '<p style="color:green;">✅ ' . esc_html__('Record updated successfully!', 'custom-crud') . '</p>';
+    if (isset($_GET['added'])) echo '<p style="color:green;">✅ ' . esc_html__('Record added successfully!', 'custom-table-crud') . '</p>';
+    if (isset($_GET['updated'])) echo '<p style="color:green;">✅ ' . esc_html__('Record updated successfully!', 'custom-table-crud') . '</p>';
     if (!empty($error_message)) echo $error_message;
 
     if ($editing && $edit_data) echo '<input type="hidden" name="record_id" value="' . esc_attr($edit_data->$primary_key) . '">';
@@ -361,13 +361,13 @@ function generic_table_manager_shortcode($config) {
             echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . '>';
         }
         if ($error) {
-            echo '<br><small style="color:red;">' . esc_html__('This field is required.', 'custom-crud') . '</small>';
+            echo '<br><small style="color:red;">' . esc_html__('This field is required.', 'custom-table-crud') . '</small>';
         }
         echo '</p>';
     }
 
-    echo '<p><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-crud') : __('Add', 'custom-crud')) . '">';
-    if ($editing) echo ' <a href="' . esc_url(remove_query_arg(['edit_record', '_wpnonce'])) . '">' . esc_html__('Cancel', 'custom-crud') . '</a>';
+    echo '<p><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-table-crud') : __('Add', 'custom-table-crud')) . '">';
+    if ($editing) echo ' <a href="' . esc_url(remove_query_arg(['edit_record', '_wpnonce'])) . '">' . esc_html__('Cancel', 'custom-table-crud') . '</a>';
     echo '</p></form>';
 
     // Search form
@@ -378,12 +378,12 @@ function generic_table_manager_shortcode($config) {
         }
     }
     
-    $total_text = sprintf(esc_html__('Records: %d', 'custom-crud'), $total);
+    $total_text = sprintf(esc_html__('Records: %d', 'custom-table-crud'), $total);
     echo '<div style="margin: 10px 0; font-weight: bold;">' . esc_html($total_text) . '</div>';
 
-    echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-crud') . '" />';
-    echo '<input type="submit" value="' . esc_attr__('Search', 'custom-crud') . '" />';
-    if ($search_term) echo ' <a href="' . esc_url(remove_query_arg('search')) . '">' . esc_html__('Clear', 'custom-crud') . '</a>';
+    echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-table-crud') . '" />';
+    echo '<input type="submit" value="' . esc_attr__('Search', 'custom-table-crud') . '" />';
+    if ($search_term) echo ' <a href="' . esc_url(remove_query_arg('search')) . '">' . esc_html__('Clear', 'custom-table-crud') . '</a>';
     echo '</form>';
 
     // Table display
@@ -393,14 +393,14 @@ function generic_table_manager_shortcode($config) {
         $new_order = ($order_by === $col && $order_dir === 'ASC') ? 'desc' : 'asc';
         echo '<th><a href="' . esc_url(add_query_arg(['orderby' => $col, 'order' => $new_order])) . '">' . esc_html($label) . '</a></th>';
     }
-    echo '<th>' . esc_html__('Actions', 'custom-crud') . '</th></tr>';
+    echo '<th>' . esc_html__('Actions', 'custom-table-crud') . '</th></tr>';
 
     if (!empty($rows)) {
         foreach ($rows as $row) {
             echo render_table_row($row, $columns, $primary_key);
         }
     } else {
-        echo '<tr><td colspan="' . (count($columns) + 2) . '">' . esc_html__('No records found.', 'custom-crud') . '</td></tr>';
+        echo '<tr><td colspan="' . (count($columns) + 2) . '">' . esc_html__('No records found.', 'custom-table-crud') . '</td></tr>';
     }
     
     echo '</table>';
