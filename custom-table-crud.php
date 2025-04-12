@@ -6,6 +6,9 @@
  * Author: affigabmag
  */
 
+//Example:
+//[wp_table_manager pagination="6" table_view="app_books" field1="fieldname=bookname;displayname=Book Name;displaytype=text" field2="fieldname=price;displayname=Book Price;displaytype=number" field3="fieldname=description;displayname=Description;displaytype=textarea"]
+
 // Register the shortcode on init to allow dynamic attributes
 function register_wp_table_manager_shortcode() {
     add_shortcode('wp_table_manager', 'handle_wp_table_manager_shortcode');
