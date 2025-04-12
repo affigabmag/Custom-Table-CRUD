@@ -18,7 +18,6 @@ function handle_wp_table_manager_shortcode($atts = []) {
         'table_view' => '',
     ];
 
-    // Merge in any fieldN attributes dynamically
     foreach ($atts as $key => $val) {
         if (preg_match('/^field\d+$/', $key)) {
             $defaults[$key] = '';
@@ -27,10 +26,6 @@ function handle_wp_table_manager_shortcode($atts = []) {
 
     $atts = shortcode_atts($defaults, $atts);
 
-    // Log to error log for additional debugging
-    error_log("Shortcode Called: " . json_encode($atts));
-
-    // Create debug log file with timestamp
     $log_file = plugin_dir_path(__FILE__) . 'shortcode_debug.log';
     $timestamp = date('Y-m-d H:i:s');
     $log_data = "\n==== [$timestamp] ====\n";
@@ -49,7 +44,7 @@ function handle_wp_table_manager_shortcode($atts = []) {
             }
             if (!empty($col['fieldname']) && !empty($col['displayname']) && !empty($col['displaytype'])) {
                 $columns[$col['fieldname']] = [
-                    'label' => $col['displayname'], // Keep displayname as-is
+                    'label' => $col['displayname'],
                     'type'  => $col['displaytype']
                 ];
             }
@@ -71,7 +66,6 @@ function handle_wp_table_manager_shortcode($atts = []) {
     ]);
 }
 
-// Admin menu for shortcode generator
 add_action('admin_menu', function() {
     add_menu_page(
         'Custom Crud',
@@ -106,7 +100,10 @@ function custom_crud_dashboard_page() {
     echo '<br><label for="pagination"><strong>Pagination:</strong></label><br>';
     echo '<input type="number" id="pagination" name="pagination" value="5" style="width: 100px;"><br><br>';
 
-    echo '<button type="submit" class="button button-primary">Generate Shortcode</button><br><br>';
+    echo '<div style="display: flex; align-items: center; gap: 10px;">';
+    echo '<button type="submit" class="button button-primary">Generate Shortcode</button>';
+    echo '<span id="copy-message" style="color:green;display:none;">Copied to clipboard!</span>';
+    echo '</div><br><br>';
 
     echo '<h2>Generated Shortcode</h2>';
     echo '<textarea id="shortcode_output" style="width:100%;height:120px;"></textarea>';
@@ -143,7 +140,14 @@ function custom_crud_dashboard_page() {
             }
         });
         const shortcode = `[wp_table_manager pagination="${pagination}" table_view="${table}"${fieldsText}]`;
-        document.getElementById("shortcode_output").value = shortcode;
+        const textarea = document.getElementById("shortcode_output");
+        textarea.value = shortcode;
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        const msg = document.getElementById("copy-message");
+        msg.style.display = "inline";
+        setTimeout(() => { msg.style.display = "none"; }, 3000);
     }
     </script>';
 
@@ -167,16 +171,17 @@ add_action('wp_ajax_get_table_fields', function() {
         echo '<div class="field-wrapper" style="margin-bottom:8px;">';
         echo '<label><input type="checkbox" class="field-checkbox" value="' . $name . '" checked> ' . $name . '</label><br>';
         echo 'Display Name: <input type="text" name="displayname_' . $name . '" value="' . $name . '" style="width:150px;"> ';
-        echo 'Type: <select name="type_' . $name . '">';
-        echo '<option value="text"' . ($type == 'text' ? ' selected' : '') . '>text</option>';
-        echo '<option value="number"' . ($type == 'number' ? ' selected' : '') . '>number</option>';
-        echo '<option value="date"' . ($type == 'date' ? ' selected' : '') . '>date</option>';
-        echo '<option value="textarea"' . ($type == 'textarea' ? ' selected' : '') . '>textarea</option>';
+        echo 'Type: <select name="type_' . $name . '">' ;
+        $types = ['text','number','date','datetime','textarea','email','url','tel','password'];
+        foreach ($types as $t) {
+            echo '<option value="' . $t . '"' . ($type == $t ? ' selected' : '') . '>' . $t . '</option>';
+        }
         echo '</select>';
         echo '</div>';
     }
     wp_die();
 });
+
 
 
 
@@ -318,6 +323,9 @@ function generic_table_manager_shortcode($config) {
     echo '</p></form>';
 
     echo '<form method="get" style="margin-top:10px;">';
+    $total_text = "Records: $total";
+    echo '<div style="margin: 10px 0; font-weight: bold;">' . $total_text . '</div>';
+
     echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="Search..." />';
     echo '<input type="submit" value="Search" />';
     if ($search_term) echo ' <a href="' . esc_url(remove_query_arg('search')) . '">Clear</a>';
