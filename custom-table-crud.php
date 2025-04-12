@@ -6,33 +6,81 @@
  * Author: affigabmag
  */
 
-add_shortcode('wp_books_manager', function ($atts = []) {
-    $atts = shortcode_atts(['pagination' => 5], $atts);
-    return generic_table_manager_shortcode([
-        'table_name'  => 'app_books',
-        'primary_key' => 'id',
-        'columns'     => [
-            'bookname'    => ['label' => 'Book Name', 'type' => 'text'],
-            'price'       => ['label' => 'Price', 'type' => 'number'],
-            'description' => ['label' => 'Description', 'type' => 'textarea']
-        ],
-        'pagination' => intval($atts['pagination'])
-    ]);
-});
+// Register the shortcode on init to allow dynamic attributes
+function register_wp_table_manager_shortcode() {
+    add_shortcode('wp_table_manager', 'handle_wp_table_manager_shortcode');
+}
+add_action('init', 'register_wp_table_manager_shortcode');
 
-add_shortcode('wp_warranties_manager', function ($atts = []) {
-    $atts = shortcode_atts(['pagination' => 5], $atts);
+function handle_wp_table_manager_shortcode($atts = []) {
+    $defaults = [
+        'pagination' => 5,
+        'table_view' => '',
+    ];
+
+    // Merge in any fieldN attributes dynamically
+    foreach ($atts as $key => $val) {
+        if (preg_match('/^field\d+$/', $key)) {
+            $defaults[$key] = '';
+        }
+    }
+
+    $atts = shortcode_atts($defaults, $atts);
+
+    // Log to error log for additional debugging
+    error_log("Shortcode Called: " . json_encode($atts));
+
+    // Create debug log file with timestamp
+    $log_file = plugin_dir_path(__FILE__) . 'shortcode_debug.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $log_data = "\n==== [$timestamp] ====\n";
+    $log_data .= "[SHORTCODE ATTRIBUTES PARSED]\n" . print_r($atts, true);
+
+    $columns = [];
+    foreach ($atts as $key => $val) {
+        if (preg_match('/^field\d+$/', $key)) {
+            $col = [];
+            $segments = explode(';', $val);
+            foreach ($segments as $seg) {
+                [$k, $v] = explode('=', $seg, 2) + [null, null];
+                if ($k && $v) {
+                    $col[trim($k)] = trim($v, " '");
+                }
+            }
+            if (!empty($col['fieldname']) && !empty($col['displayname']) && !empty($col['displaytype'])) {
+                $columns[$col['fieldname']] = [
+                    'label' => $col['displayname'], // Keep displayname as-is
+                    'type'  => $col['displaytype']
+                ];
+            }
+        }
+    }
+
+    $log_data .= "\n[PARSED COLUMNS]\n" . print_r($columns, true);
+    file_put_contents($log_file, $log_data, FILE_APPEND);
+
+    if (empty($columns)) {
+        return '<div style="color:red;">⚠️ No valid fields defined in shortcode.</div>';
+    }
+
     return generic_table_manager_shortcode([
-        'table_name'  => 'app_warranties',
+        'table_name'  => $atts['table_view'],
         'primary_key' => 'id',
-        'columns'     => [
-            'ProductName'     => ['label' => 'Product Name', 'type' => 'text'],
-            'DateOfPurchase'  => ['label' => 'Date of Purchase', 'type' => 'date'],
-            'Notes'           => ['label' => 'Notes', 'type' => 'textarea']
-        ],
-        'pagination' => intval($atts['pagination'])
+        'columns'     => $columns,
+        'pagination'  => intval($atts['pagination'])
     ]);
-});
+}
+
+function render_table_row($row, $columns, $primary_key) {
+    $output = '<tr>';
+    foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
+        $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
+    }
+    $output .= '<td><a href="' . esc_url(add_query_arg('edit_record', $row->$primary_key)) . '">Edit</a> | ';
+    $output .= '<a href="' . esc_url(add_query_arg('delete_record', $row->$primary_key)) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
+    $output .= '</tr>';
+    return $output;
+}
 
 function render_pagination_controls($page, $total, $per_page) {
     $total_pages = ceil($total / $per_page);
@@ -50,17 +98,6 @@ function render_pagination_controls($page, $total, $per_page) {
     }
 
     $output .= '</form>';
-    return $output;
-}
-
-function render_table_row($row, $columns, $primary_key) {
-    $output = '<tr>';
-    foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
-        $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
-    }
-    $output .= '<td><a href="' . esc_url(add_query_arg('edit_record', $row->$primary_key)) . '">Edit</a> | ';
-    $output .= '<a href="' . esc_url(add_query_arg('delete_record', $row->$primary_key)) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
-    $output .= '</tr>';
     return $output;
 }
 
