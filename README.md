@@ -1,61 +1,77 @@
 # Custom Table CRUD Plugin
 
-A lightweight and flexible **WordPress plugin** for managing **custom database tables** with a front-end UI.  
-Supports **Add, Edit, Delete, Search, Sort, Pagination** and works with **any table** you define.
+A flexible **WordPress plugin** that allows CRUD (Create, Read, Update, Delete) operations on **custom database tables** using dynamic shortcodes and a user-friendly admin dashboard.
 
 ---
 
 ## 🚀 Features
 
-- 🔹 Generic UI for any custom DB table
-- 🔹 Create front-end forms using shortcodes
-- 🔹 Supports pagination, sorting, search
-- 🔹 Editable from WordPress frontend
-- 🔹 Lightweight & no external dependencies
+- 🔹 CRUD for any custom database table
+- 🔹 Select any table from the database via dropdown
+- 🔹 Choose and name which fields to include
+- 🔹 Assign a type to each field (text, textarea, number, date, etc.)
+- 🔹 Front-end forms powered by shortcodes
+- 🔹 Admin dashboard panel for shortcode generation
+- 🔹 Supports pagination, search, and sorting
+- 🔹 Lightweight, no external dependencies
 
 ---
 
 ## ⚙️ Installation
 
 1. Clone or download this repo into your WordPress `wp-content/plugins/` directory  
-2. Make sure your desired table already exists in the MySQL database  
+2. Ensure your desired table exists in the MySQL database  
 3. Activate the plugin from the WordPress admin  
-4. Define your shortcodes for each table (see below)  
-5. Use the shortcodes in pages or posts
+4. Navigate to **Custom Crud** in the admin menu  
+5. Use the GUI to generate your shortcode
+6. Paste the shortcode into any post or page
 
 ---
 
-## 🧩 How to Register Tables
+## 🧪 Supported Field Types
 
-After creating a table manually in the database (e.g. `wp_books`, `wp_warranties`),  
-add your shortcode definition inside the plugin file like this:
+- `text` – Single-line text input
+- `textarea` – Multi-line input
+- `number` – Numeric input
+- `date` – Date picker
+- `datetime` – Date & time picker
+- `email` – Email input
+- `url` – URL input
+- `tel` – Telephone input
+- `password` – Password input
 
-```php
-add_shortcode('wp_books_manager', 'wp_books_manager_shortcode');
-add_shortcode('wp_warranties_manager', 'wp_warranties_manager_shortcode');
+---
 
-function wp_books_manager_shortcode() {
-    global $wpdb;
-    return generic_table_manager_shortcode([
-        'table_name'  => $wpdb->prefix . 'books',
-        'primary_key' => 'id',
-        'columns'     => [
-            'name'        => 'Book Name',
-            'price'       => 'Price',
-            'description' => 'Description'
-        ]
-    ]);
-}
+## ✨ Shortcode Format
 
-function wp_warranties_manager_shortcode() {
-    global $wpdb;
-    return generic_table_manager_shortcode([
-        'table_name'  => $wpdb->prefix . 'warranties',
-        'primary_key' => 'id',
-        'columns'     => [
-            'ProductName'     => 'Product Name',
-            'DateOfPurchase'  => 'Date Of Purchase',
-            'Notes'           => 'Notes'
-        ]
-    ]);
-}
+The plugin dynamically creates shortcodes like:
+
+```txt
+[wp_table_manager pagination="6" table_view="your_table_name"
+ field1="fieldname=your_column;displayname=Your Label;displaytype=text"
+ field2="fieldname=another_column;displayname=Label 2;displaytype=number"]
+```
+
+Use the admin panel to generate this easily without writing code.
+
+---
+
+## 📋 Example Use Case
+
+1. You create a table named `app_books` in your database.
+2. Use the plugin dashboard to select that table.
+3. Choose `bookname`, `price`, and `description` fields.
+4. Assign display types (e.g., `text`, `number`, `textarea`).
+5. Copy the generated shortcode and paste into a page.
+6. Done! You have a frontend CRUD interface for books.
+
+---
+
+## 🙌 Author
+Developed by **affigabmag**
+
+---
+
+## 📄 License
+This project is licensed under the MIT License.
+
