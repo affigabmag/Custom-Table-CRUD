@@ -1,10 +1,10 @@
-=== Custom Table CRUD ===
+=== Custom Table CRUD with Debug + Pagination Fix ===
 Contributors: affigabmag  
 Tags: tables, custom tables, database, admin ui, shortcode, wordpress plugin  
 Requires at least: 5.0  
 Tested up to: 6.7  
 Requires PHP: 7.4  
-Stable tag: 1.4  
+Stable tag: 1.5  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -12,7 +12,7 @@ A flexible shortcode-based plugin that lets you manage custom WordPress database
 
 == Description ==
 
-WP Table Manager is a lightweight WordPress plugin designed for managing custom database tables via shortcodes and admin UI.  
+Custom Table CRUD with Debug + Pagination Fix is a lightweight WordPress plugin designed for managing custom database tables via shortcodes and admin UI.  
 Select your table, define the fields, and generate a shortcode for use on any page or post.
 
 Features include:
@@ -24,7 +24,7 @@ Features include:
 
 == Installation ==
 
-1. Upload the plugin folder (`wp-table-manager/`) to the `/wp-content/plugins/` directory.
+1. Upload the plugin folder (`custom-table-crud/`) to the `/wp-content/plugins/` directory.
 2. Activate the plugin from the WordPress Dashboard.
 3. Create your custom database table(s) manually.
 4. Go to the **Custom Crud** admin menu to generate shortcodes.
@@ -43,6 +43,13 @@ Text, number, textarea, date, datetime, email, URL, tel, and password inputs.
 
 == Changelog ==
 
+= 1.5 =
+* Security update: Added proper escaping to outputs
+* Security update: Added prepared SQL statements 
+* Security update: Added nonce verification for forms
+* Fixed bug with pagination on certain table structures
+* Updated UI for better accessibility
+
 = 1.4 =
 * Major update: added admin dashboard and dynamic shortcode generation.
 * New: Admin dashboard for shortcode generation
@@ -56,10 +63,12 @@ Text, number, textarea, date, datetime, email, URL, tel, and password inputs.
 
 == Upgrade Notice ==
 
+= 1.5 =
+Security update: Better SQL handling and fixing escaping issues. All users should update immediately.
+
 = 1.4 =
 Major update: added admin dashboard and dynamic shortcode generation.
 
 == License ==
 
 This plugin is released under the GPLv2 or later license.
-
