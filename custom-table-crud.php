@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Custom Table CRUD with Debug + Pagination Fix
  * Description: CRUD for custom DB tables with working pagination inside shortcodes.
- * Version: 1.4
+ * Version: 1.5
  * Author: affigabmag
  */
 
@@ -37,9 +37,13 @@ function handle_wp_table_manager_shortcode($atts = []) {
             $col = [];
             $segments = explode(';', $val);
             foreach ($segments as $seg) {
-                [$k, $v] = explode('=', $seg, 2) + [null, null];
-                if ($k && $v) {
-                    $col[trim($k)] = trim($v, " '");
+                $parts = explode('=', $seg, 2);
+                if (count($parts) === 2) {
+                    $k = $parts[0];
+                    $v = $parts[1];
+                    if ($k && $v) {
+                        $col[trim($k)] = trim($v, " '");
+                    }
                 }
             }
             if (!empty($col['fieldname']) && !empty($col['displayname']) && !empty($col['displaytype'])) {
@@ -86,6 +90,7 @@ function custom_crud_dashboard_page() {
     echo '<p>Welcome to your custom CRUD dashboard.</p>';
 
     echo '<form method="post" onsubmit="generateShortcode(); return false;">';
+    wp_nonce_field('custom_crud_form', 'custom_crud_nonce');
 
     echo '<label for="table_view"><strong>Select Table:</strong></label><br>';
     echo '<select id="table_view" name="table_view" style="width: 300px;" onchange="loadFields(this.value)">';
@@ -120,7 +125,8 @@ function custom_crud_dashboard_page() {
                 document.getElementById("field_select_container").innerHTML = xhr.responseText;
             }
         };
-        xhr.send("action=get_table_fields&table=" + encodeURIComponent(tableName));
+        const nonce = document.getElementById("custom_crud_nonce").value;
+        xhr.send("action=get_table_fields&table=" + encodeURIComponent(tableName) + "&nonce=" + encodeURIComponent(nonce));
     }
 
     function generateShortcode() {
@@ -155,12 +161,24 @@ function custom_crud_dashboard_page() {
 }
 
 add_action('wp_ajax_get_table_fields', function() {
+    // Verify nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'custom_crud_form')) {
+        wp_die('Security check failed');
+    }
+
     global $wpdb;
     $table = sanitize_text_field($_POST['table'] ?? '');
     if (!$table) {
         wp_die();
     }
-    $columns = $wpdb->get_results("SHOW COLUMNS FROM `$table`");
+    
+    // Use prepared statement for security
+    $columns = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM %i", $table));
+    
+    if (!$columns) {
+        wp_die();
+    }
+
     foreach ($columns as $col) {
         $name = esc_attr($col->Field);
         $type = 'text';
@@ -169,12 +187,12 @@ add_action('wp_ajax_get_table_fields', function() {
         elseif (strpos($col->Type, 'text') !== false) $type = 'textarea';
 
         echo '<div class="field-wrapper" style="margin-bottom:8px;">';
-        echo '<label><input type="checkbox" class="field-checkbox" value="' . $name . '" checked> ' . $name . '</label><br>';
-        echo 'Display Name: <input type="text" name="displayname_' . $name . '" value="' . $name . '" style="width:150px;"> ';
-        echo 'Type: <select name="type_' . $name . '">' ;
+        echo '<label><input type="checkbox" class="field-checkbox" value="' . esc_attr($name) . '" checked> ' . esc_html($name) . '</label><br>';
+        echo 'Display Name: <input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" style="width:150px;"> ';
+        echo 'Type: <select name="type_' . esc_attr($name) . '">' ;
         $types = ['text','number','date','datetime','textarea','email','url','tel','password'];
         foreach ($types as $t) {
-            echo '<option value="' . $t . '"' . ($type == $t ? ' selected' : '') . '>' . $t . '</option>';
+            echo '<option value="' . esc_attr($t) . '"' . ($type == $t ? ' selected' : '') . '>' . esc_html($t) . '</option>';
         }
         echo '</select>';
         echo '</div>';
@@ -182,16 +200,13 @@ add_action('wp_ajax_get_table_fields', function() {
     wp_die();
 });
 
-
-
-
 function render_table_row($row, $columns, $primary_key) {
     $output = '<tr>';
     foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
         $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
     }
-    $output .= '<td><a href="' . esc_url(add_query_arg('edit_record', $row->$primary_key)) . '">Edit</a> | ';
-    $output .= '<a href="' . esc_url(add_query_arg('delete_record', $row->$primary_key)) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
+    $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">' . esc_html__('Edit', 'custom-crud') . '</a> | ';
+    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'' . esc_js(__('Are you sure?', 'custom-crud')) . '\');">' . esc_html__('Delete', 'custom-crud') . '</a></td>';
     $output .= '</tr>';
     return $output;
 }
@@ -200,15 +215,16 @@ function render_pagination_controls($page, $total, $per_page) {
     $total_pages = ceil($total / $per_page);
     $output = '<form method="post" style="margin-top: 10px;">';
     $output .= '<input type="hidden" name="form_type" value="pagination">';
+    $output .= wp_nonce_field('pagination_nonce', 'pagination_nonce', true, false);
 
     if ($page > 1) {
-        $output .= '<button type="submit" name="paged" value="' . ($page - 1) . '">&laquo; Prev</button> ';
+        $output .= '<button type="submit" name="paged" value="' . esc_attr($page - 1) . '">&laquo; ' . esc_html__('Prev', 'custom-crud') . '</button> ';
     }
 
-    $output .= 'Page ' . $page . ' of ' . $total_pages . ' ';
+    $output .= esc_html__('Page', 'custom-crud') . ' ' . esc_html($page) . ' ' . esc_html__('of', 'custom-crud') . ' ' . esc_html($total_pages) . ' ';
 
     if ($page < $total_pages) {
-        $output .= '<button type="submit" name="paged" value="' . ($page + 1) . '">Next &raquo;</button>';
+        $output .= '<button type="submit" name="paged" value="' . esc_attr($page + 1) . '">' . esc_html__('Next', 'custom-crud') . ' &raquo;</button>';
     }
 
     $output .= '</form>';
@@ -225,78 +241,102 @@ function generic_table_manager_shortcode($config) {
     $editing     = false;
     $edit_data   = null;
 
-    if (isset($_GET['delete_record'])) {
-        $wpdb->delete($table_name, [$primary_key => intval($_GET['delete_record'])]);
-        wp_redirect(remove_query_arg(['delete_record', 'edit_record', 'added', 'updated']));
-        exit;
+    // Process delete action with nonce verification
+    if (isset($_GET['delete_record'], $_GET['_wpnonce'])) {
+        $record_id = intval($_GET['delete_record']);
+        if (wp_verify_nonce($_GET['_wpnonce'], 'delete_record_' . $record_id)) {
+            $wpdb->delete($table_name, [$primary_key => $record_id], ['%d']);
+            wp_redirect(remove_query_arg(['delete_record', 'edit_record', 'added', 'updated', '_wpnonce']));
+            exit;
+        }
     }
 
-    if (!empty($_POST) && isset($_POST['form_type']) && $_POST['form_type'] === 'data_form') {
-        $data = [];
-        $format = [];
-        $has_error = false;
+    // Process form submissions with nonce verification
+    if (!empty($_POST) && isset($_POST['form_type'], $_POST['crud_nonce'])) {
+        if ($_POST['form_type'] === 'data_form' && wp_verify_nonce($_POST['crud_nonce'], 'crud_form_nonce')) {
+            $data = [];
+            $format = [];
+            $has_error = false;
 
-        foreach ($columns as $field => $meta) {
-            $raw = $_POST[$field] ?? '';
-            $value = ($meta['type'] === 'textarea') ? sanitize_textarea_field($raw) : sanitize_text_field($raw);
-            $data[$field] = $value;
-            $format[] = (is_numeric($value) && strpos($value, '.') !== false) ? '%f' : '%s';
+            foreach ($columns as $field => $meta) {
+                $raw = $_POST[$field] ?? '';
+                $value = ($meta['type'] === 'textarea') ? sanitize_textarea_field($raw) : sanitize_text_field($raw);
+                $data[$field] = $value;
+                $format[] = (is_numeric($value) && strpos($value, '.') !== false) ? '%f' : '%s';
 
-            if ($value === '') {
-                $has_error = true;
+                if ($value === '') {
+                    $has_error = true;
+                }
             }
-        }
 
-        if ($has_error) {
-            echo '<p style="color:red;">⚠️ All fields are required.</p>';
-        } else {
-            if (isset($_POST['update_record'])) {
-                $wpdb->update($table_name, $data, [$primary_key => intval($_POST['record_id'])], $format, ['%d']);
-                wp_redirect(add_query_arg('updated', '1', remove_query_arg(['edit_record'])));
-                exit;
+            if ($has_error) {
+                $error_message = '<p style="color:red;">⚠️ ' . esc_html__('All fields are required.', 'custom-crud') . '</p>';
             } else {
-                $wpdb->insert($table_name, $data, $format);
-                wp_redirect(add_query_arg('added', '1', $_SERVER['REQUEST_URI']));
-                exit;
+                if (isset($_POST['update_record'])) {
+                    $record_id = intval($_POST['record_id']);
+                    $wpdb->update($table_name, $data, [$primary_key => $record_id], $format, ['%d']);
+                    wp_redirect(add_query_arg('updated', '1', remove_query_arg(['edit_record', '_wpnonce'])));
+                    exit;
+                } else {
+                    $wpdb->insert($table_name, $data, $format);
+                    wp_redirect(add_query_arg('added', '1', remove_query_arg('_wpnonce', $_SERVER['REQUEST_URI'])));
+                    exit;
+                }
             }
+        } else if ($_POST['form_type'] === 'pagination' && wp_verify_nonce($_POST['pagination_nonce'], 'pagination_nonce')) {
+            // Pagination form is valid, continue processing
         }
     }
 
-    if (isset($_GET['edit_record'])) {
-        $editing = true;
-        $edit_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE $primary_key = %d", intval($_GET['edit_record'])));
+    // Process edit with nonce verification
+    if (isset($_GET['edit_record'], $_GET['_wpnonce'])) {
+        $record_id = intval($_GET['edit_record']);
+        if (wp_verify_nonce($_GET['_wpnonce'], 'edit_record_' . $record_id)) {
+            $editing = true;
+            $edit_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE $primary_key = %d", $record_id));
+        }
     }
 
-    $search_term = $_GET['search'] ?? '';
-    $order_by = isset($_GET['orderby']) && array_key_exists($_GET['orderby'], $columns) ? $_GET['orderby'] : $primary_key;
+    $search_term = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
+    $order_by = isset($_GET['orderby']) && array_key_exists($_GET['orderby'], $columns) ? sanitize_key($_GET['orderby']) : $primary_key;
     $order_dir = (isset($_GET['order']) && strtolower($_GET['order']) === 'asc') ? 'ASC' : 'DESC';
 
-    $query = "SELECT * FROM $table_name";
+    // Build query with proper escaping
+    $query = "SELECT * FROM " . esc_sql($table_name);
+    $search_clauses = [];
+
     if ($search_term) {
-        $search_term = sanitize_text_field($search_term);
-        $where = array_map(fn($col) => "$col LIKE '%$search_term%'", array_keys($columns));
-        $query .= " WHERE " . implode(' OR ', $where);
+        foreach (array_keys($columns) as $col) {
+            $search_clauses[] = $wpdb->prepare("$col LIKE %s", '%' . $wpdb->esc_like($search_term) . '%');
+        }
+        $query .= " WHERE " . implode(' OR ', $search_clauses);
     }
-    $query .= " ORDER BY $order_by $order_dir";
+    
+    $query .= " ORDER BY " . esc_sql($order_by) . " " . esc_sql($order_dir);
 
     $page = isset($_POST['paged']) ? max(1, intval($_POST['paged'])) : (isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1);
     $offset = ($page - 1) * $per_page;
 
-    $total = $wpdb->get_var(str_replace('SELECT *', 'SELECT COUNT(*)', $query));
-    $query .= " LIMIT $offset, $per_page";
+    $total_query = str_replace('SELECT *', 'SELECT COUNT(*)', $query);
+    $total = $wpdb->get_var($total_query);
+    
+    $query .= $wpdb->prepare(" LIMIT %d, %d", $offset, $per_page);
     $rows = $wpdb->get_results($query);
 
     ob_start();
 
     echo '<form method="post">';
+    echo '<input type="hidden" name="form_type" value="data_form">';
+    echo wp_nonce_field('crud_form_nonce', 'crud_nonce', true, false);
+    
     echo '<style>.wp-books-table { border-collapse: collapse; width: 100%; margin-top: 20px; }
     .wp-books-table th, .wp-books-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     .wp-books-table th { background: #f0f0f0; }</style>';
 
-    if (isset($_GET['added'])) echo '<p style="color:green;">✅ Record added successfully!</p>';
-    if (isset($_GET['updated'])) echo '<p style="color:green;">✅ Record updated successfully!</p>';
+    if (isset($_GET['added'])) echo '<p style="color:green;">✅ ' . esc_html__('Record added successfully!', 'custom-crud') . '</p>';
+    if (isset($_GET['updated'])) echo '<p style="color:green;">✅ ' . esc_html__('Record updated successfully!', 'custom-crud') . '</p>';
+    if (isset($error_message)) echo $error_message;
 
-    echo '<input type="hidden" name="form_type" value="data_form">';
     if ($editing && $edit_data) echo '<input type="hidden" name="record_id" value="' . esc_attr($edit_data->$primary_key) . '">';
 
     foreach ($columns as $field => $meta) {
@@ -313,35 +353,48 @@ function generic_table_manager_shortcode($config) {
             echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . '>';
         }
         if ($error) {
-            echo '<br><small style="color:red;">This field is required.</small>';
+            echo '<br><small style="color:red;">' . esc_html__('This field is required.', 'custom-crud') . '</small>';
         }
         echo '</p>';
     }
 
-    echo '<p><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . ($editing ? 'Update' : 'Add') . '">';
-    if ($editing) echo ' <a href="' . esc_url(remove_query_arg('edit_record')) . '">Cancel</a>';
+    echo '<p><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-crud') : __('Add', 'custom-crud')) . '">';
+    if ($editing) echo ' <a href="' . esc_url(remove_query_arg(['edit_record', '_wpnonce'])) . '">' . esc_html__('Cancel', 'custom-crud') . '</a>';
     echo '</p></form>';
 
+    // Search form
     echo '<form method="get" style="margin-top:10px;">';
-    $total_text = "Records: $total";
-    echo '<div style="margin: 10px 0; font-weight: bold;">' . $total_text . '</div>';
+    foreach ($_GET as $key => $value) {
+        if ($key !== 'search' && $key !== 'paged') {
+            echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '">';
+        }
+    }
+    
+    $total_text = sprintf(esc_html__('Records: %d', 'custom-crud'), $total);
+    echo '<div style="margin: 10px 0; font-weight: bold;">' . esc_html($total_text) . '</div>';
 
-    echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="Search..." />';
-    echo '<input type="submit" value="Search" />';
-    if ($search_term) echo ' <a href="' . esc_url(remove_query_arg('search')) . '">Clear</a>';
+    echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-crud') . '" />';
+    echo '<input type="submit" value="' . esc_attr__('Search', 'custom-crud') . '" />';
+    if ($search_term) echo ' <a href="' . esc_url(remove_query_arg('search')) . '">' . esc_html__('Clear', 'custom-crud') . '</a>';
     echo '</form>';
 
+    // Table display
     echo '<table class="wp-books-table"><tr>';
     foreach (array_merge([$primary_key => 'ID'], $columns) as $col => $meta) {
         $label = is_array($meta) ? $meta['label'] : $meta;
         $new_order = ($order_by === $col && $order_dir === 'ASC') ? 'desc' : 'asc';
         echo '<th><a href="' . esc_url(add_query_arg(['orderby' => $col, 'order' => $new_order])) . '">' . esc_html($label) . '</a></th>';
     }
-    echo '<th>Actions</th></tr>';
+    echo '<th>' . esc_html__('Actions', 'custom-crud') . '</th></tr>';
 
-    foreach ($rows as $row) {
-        echo render_table_row($row, $columns, $primary_key);
+    if (!empty($rows)) {
+        foreach ($rows as $row) {
+            echo render_table_row($row, $columns, $primary_key);
+        }
+    } else {
+        echo '<tr><td colspan="' . (count($columns) + 2) . '">' . esc_html__('No records found.', 'custom-crud') . '</td></tr>';
     }
+    
     echo '</table>';
 
     if ($total > $per_page) {
