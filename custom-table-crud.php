@@ -6,9 +6,6 @@
  * Author: affigabmag
  */
 
-//Example:
-//[wp_table_manager pagination="6" table_view="app_books" field1="fieldname=bookname;displayname=Book Name;displaytype=text" field2="fieldname=price;displayname=Book Price;displaytype=number" field3="fieldname=description;displayname=Description;displaytype=textarea"]
-
 // Register the shortcode on init to allow dynamic attributes
 function register_wp_table_manager_shortcode() {
     add_shortcode('wp_table_manager', 'handle_wp_table_manager_shortcode');
@@ -73,6 +70,115 @@ function handle_wp_table_manager_shortcode($atts = []) {
         'pagination'  => intval($atts['pagination'])
     ]);
 }
+
+// Admin menu for shortcode generator
+add_action('admin_menu', function() {
+    add_menu_page(
+        'Custom Crud',
+        'Custom Crud',
+        'manage_options',
+        'custom_crud_dashboard',
+        'custom_crud_dashboard_page',
+        'dashicons-admin-generic'
+    );
+});
+
+function custom_crud_dashboard_page() {
+    global $wpdb;
+    $tables = $wpdb->get_col("SHOW TABLES");
+
+    echo '<div class="wrap">';
+    echo '<h1>Custom Crud - Dashboard</h1>';
+    echo '<p>Welcome to your custom CRUD dashboard.</p>';
+
+    echo '<form method="post" onsubmit="generateShortcode(); return false;">';
+
+    echo '<label for="table_view"><strong>Select Table:</strong></label><br>';
+    echo '<select id="table_view" name="table_view" style="width: 300px;" onchange="loadFields(this.value)">';
+    echo '<option value="">-- Select Table --</option>';
+    foreach ($tables as $table) {
+        echo '<option value="' . esc_attr($table) . '">' . esc_html($table) . '</option>';
+    }
+    echo '</select><br><br>';
+
+    echo '<div id="field_select_container"></div>';
+
+    echo '<br><label for="pagination"><strong>Pagination:</strong></label><br>';
+    echo '<input type="number" id="pagination" name="pagination" value="5" style="width: 100px;"><br><br>';
+
+    echo '<button type="submit" class="button button-primary">Generate Shortcode</button><br><br>';
+
+    echo '<h2>Generated Shortcode</h2>';
+    echo '<textarea id="shortcode_output" style="width:100%;height:120px;"></textarea>';
+
+    echo '</form>';
+
+    echo '<script>
+    function loadFields(tableName) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", ajaxurl);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                document.getElementById("field_select_container").innerHTML = xhr.responseText;
+            }
+        };
+        xhr.send("action=get_table_fields&table=" + encodeURIComponent(tableName));
+    }
+
+    function generateShortcode() {
+        const table = document.getElementById("table_view").value;
+        const pagination = document.getElementById("pagination").value;
+        const wrappers = document.querySelectorAll(".field-wrapper");
+        let fieldIndex = 1;
+        let fieldsText = "";
+        wrappers.forEach(wrap => {
+            const checkbox = wrap.querySelector("input[type=checkbox]");
+            if (checkbox && checkbox.checked) {
+                const fieldname = checkbox.value;
+                const displayname = wrap.querySelector("input[name^=displayname_]").value || fieldname;
+                const displaytype = wrap.querySelector("select[name^=type_]").value;
+                fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}"`;
+                fieldIndex++;
+            }
+        });
+        const shortcode = `[wp_table_manager pagination="${pagination}" table_view="${table}"${fieldsText}]`;
+        document.getElementById("shortcode_output").value = shortcode;
+    }
+    </script>';
+
+    echo '</div>';
+}
+
+add_action('wp_ajax_get_table_fields', function() {
+    global $wpdb;
+    $table = sanitize_text_field($_POST['table'] ?? '');
+    if (!$table) {
+        wp_die();
+    }
+    $columns = $wpdb->get_results("SHOW COLUMNS FROM `$table`");
+    foreach ($columns as $col) {
+        $name = esc_attr($col->Field);
+        $type = 'text';
+        if (strpos($col->Type, 'int') !== false || strpos($col->Type, 'float') !== false) $type = 'number';
+        elseif (strpos($col->Type, 'date') !== false) $type = 'date';
+        elseif (strpos($col->Type, 'text') !== false) $type = 'textarea';
+
+        echo '<div class="field-wrapper" style="margin-bottom:8px;">';
+        echo '<label><input type="checkbox" class="field-checkbox" value="' . $name . '" checked> ' . $name . '</label><br>';
+        echo 'Display Name: <input type="text" name="displayname_' . $name . '" value="' . $name . '" style="width:150px;"> ';
+        echo 'Type: <select name="type_' . $name . '">';
+        echo '<option value="text"' . ($type == 'text' ? ' selected' : '') . '>text</option>';
+        echo '<option value="number"' . ($type == 'number' ? ' selected' : '') . '>number</option>';
+        echo '<option value="date"' . ($type == 'date' ? ' selected' : '') . '>date</option>';
+        echo '<option value="textarea"' . ($type == 'textarea' ? ' selected' : '') . '>textarea</option>';
+        echo '</select>';
+        echo '</div>';
+    }
+    wp_die();
+});
+
+
 
 function render_table_row($row, $columns, $primary_key) {
     $output = '<tr>';
