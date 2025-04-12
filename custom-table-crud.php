@@ -83,25 +83,31 @@ function generic_table_manager_shortcode($config) {
     if (!empty($_POST) && isset($_POST['form_type']) && $_POST['form_type'] === 'data_form') {
         $data = [];
         $format = [];
+        $has_error = false;
 
         foreach ($columns as $field => $meta) {
-            $value = sanitize_text_field($_POST[$field] ?? '');
-            if ($value === '') {
-                echo '<p style="color:red;">⚠️ All fields are required.</p>';
-                return;
-            }
+            $raw = $_POST[$field] ?? '';
+            $value = ($meta['type'] === 'textarea') ? sanitize_textarea_field($raw) : sanitize_text_field($raw);
             $data[$field] = $value;
             $format[] = (is_numeric($value) && strpos($value, '.') !== false) ? '%f' : '%s';
+
+            if ($value === '') {
+                $has_error = true;
+            }
         }
 
-        if (isset($_POST['update_record'])) {
-            $wpdb->update($table_name, $data, [$primary_key => intval($_POST['record_id'])], $format, ['%d']);
-            wp_redirect(add_query_arg('updated', '1', remove_query_arg(['edit_record'])));
-            exit;
+        if ($has_error) {
+            echo '<p style="color:red;">⚠️ All fields are required.</p>';
         } else {
-            $wpdb->insert($table_name, $data, $format);
-            wp_redirect(add_query_arg('added', '1', $_SERVER['REQUEST_URI']));
-            exit;
+            if (isset($_POST['update_record'])) {
+                $wpdb->update($table_name, $data, [$primary_key => intval($_POST['record_id'])], $format, ['%d']);
+                wp_redirect(add_query_arg('updated', '1', remove_query_arg(['edit_record'])));
+                exit;
+            } else {
+                $wpdb->insert($table_name, $data, $format);
+                wp_redirect(add_query_arg('added', '1', $_SERVER['REQUEST_URI']));
+                exit;
+            }
         }
     }
 
@@ -145,14 +151,18 @@ function generic_table_manager_shortcode($config) {
     foreach ($columns as $field => $meta) {
         $label = $meta['label'];
         $type  = $meta['type'];
-        $value = $editing && isset($edit_data->$field) ? $edit_data->$field : '';
+        $value = $_POST[$field] ?? ($editing && isset($edit_data->$field) ? $edit_data->$field : '');
+        $error = isset($_POST['form_type'], $_POST[$field]) && trim($_POST[$field]) === '';
 
         echo '<p><label>' . esc_html($label) . ':</label><br>';
         if ($type === 'textarea') {
-            echo '<textarea name="' . esc_attr($field) . '" rows="3">' . esc_textarea($value) . '</textarea>';
+            echo '<textarea name="' . esc_attr($field) . '" rows="3" required>' . esc_textarea($value) . '</textarea>';
         } else {
             $step = $type === 'number' ? ' step="any"' : '';
             echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . '>';
+        }
+        if ($error) {
+            echo '<br><small style="color:red;">This field is required.</small>';
         }
         echo '</p>';
     }
