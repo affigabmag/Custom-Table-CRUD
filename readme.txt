@@ -54,6 +54,11 @@ Text, number, textarea, date, datetime, email, URL, tel, and password inputs.
 = 1.0 =
 * Initial public release
 
+== Upgrade Notice ==
+
+= 1.4 =
+Major update: added admin dashboard and dynamic shortcode generation.
+
 == License ==
 
 This plugin is released under the GPLv2 or later license.
