@@ -31,7 +31,7 @@ function handle_wp_table_manager_shortcode($atts = []) {
     $atts = shortcode_atts($defaults, $atts);
 
     $log_file = plugin_dir_path(__FILE__) . 'shortcode_debug.log';
-    $timestamp = date('Y-m-d H:i:s');
+    $timestamp = gmdate('Y-m-d H:i:s');
     $log_data = "\n==== [$timestamp] ====\n";
     $log_data .= "[SHORTCODE ATTRIBUTES PARSED]\n" . print_r($atts, true);
 
@@ -76,8 +76,8 @@ function handle_wp_table_manager_shortcode($atts = []) {
 
 add_action('admin_menu', function() {
     add_menu_page(
-        'Custom Crud',
-        'Custom Crud',
+        esc_html__('Custom Crud', 'custom-table-crud'),
+        esc_html__('Custom Crud', 'custom-table-crud'),
         'manage_options',
         'custom_crud_dashboard',
         'custom_crud_dashboard_page',
@@ -86,6 +86,11 @@ add_action('admin_menu', function() {
 });
 
 function custom_crud_dashboard_page() {
+    // Check user capability
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+    
     global $wpdb;
     $tables = $wpdb->get_col("SHOW TABLES");
 
@@ -166,8 +171,8 @@ function custom_crud_dashboard_page() {
 
 add_action('wp_ajax_get_table_fields', function() {
     // Verify nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'custom_crud_form')) {
-        wp_die('Security check failed');
+    if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field($_POST['nonce']), 'custom_crud_form')) {
+        wp_die(esc_html__('Security check failed', 'custom-table-crud'));
     }
 
     global $wpdb;
@@ -178,6 +183,8 @@ add_action('wp_ajax_get_table_fields', function() {
     
     // For SHOW COLUMNS, we need to use esc_sql because %i doesn't work with SHOW COLUMNS
     $table_name = esc_sql($table);
+    // Add translators comment for context
+    // translators: %s is the table name
     $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
     
     if (!$columns) {
@@ -211,7 +218,9 @@ function render_table_row($row, $columns, $primary_key) {
         $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
     }
     $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">' . esc_html__('Edit', 'custom-table-crud') . '</a> | ';
-    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'' . esc_js(__('Are you sure?', 'custom-table-crud')) . '\');">' . esc_html__('Delete', 'custom-table-crud') . '</a></td>';
+    // translators: This is the confirmation message when deleting a record
+    $confirm_message = __('Are you sure?', 'custom-table-crud');
+    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'' . esc_js($confirm_message) . '\');">' . esc_html__('Delete', 'custom-table-crud') . '</a></td>';
     $output .= '</tr>';
     return $output;
 }
@@ -223,13 +232,21 @@ function render_pagination_controls($page, $total, $per_page) {
     $output .= wp_nonce_field('pagination_nonce', 'pagination_nonce', true, false);
 
     if ($page > 1) {
-        $output .= '<button type="submit" name="paged" value="' . esc_attr($page - 1) . '">&laquo; ' . esc_html__('Prev', 'custom-table-crud') . '</button> ';
+        // translators: Previous button for pagination
+        $prev_text = __('Prev', 'custom-table-crud');
+        $output .= '<button type="submit" name="paged" value="' . esc_attr($page - 1) . '">&laquo; ' . esc_html($prev_text) . '</button> ';
     }
 
-    $output .= esc_html__('Page', 'custom-table-crud') . ' ' . esc_html($page) . ' ' . esc_html__('of', 'custom-table-crud') . ' ' . esc_html($total_pages) . ' ';
+    // translators: %1$s is the current page number, %2$s is the total number of pages
+    $page_text = sprintf(__('Page %1$s of %2$s', 'custom-table-crud'), 
+                         '<span>' . esc_html($page) . '</span>', 
+                         '<span>' . esc_html($total_pages) . '</span>');
+    $output .= $page_text . ' ';
 
     if ($page < $total_pages) {
-        $output .= '<button type="submit" name="paged" value="' . esc_attr($page + 1) . '">' . esc_html__('Next', 'custom-table-crud') . ' &raquo;</button>';
+        // translators: Next button for pagination
+        $next_text = __('Next', 'custom-table-crud');
+        $output .= '<button type="submit" name="paged" value="' . esc_attr($page + 1) . '">' . esc_html($next_text) . ' &raquo;</button>';
     }
 
     $output .= '</form>';
@@ -250,16 +267,17 @@ function generic_table_manager_shortcode($config) {
     // Process delete action with nonce verification
     if (isset($_GET['delete_record'], $_GET['_wpnonce'])) {
         $record_id = intval($_GET['delete_record']);
-        if (wp_verify_nonce($_GET['_wpnonce'], 'delete_record_' . $record_id)) {
-            $wpdb->delete($table_name, [$primary_key => $record_id], ['%d']);
-            wp_redirect(remove_query_arg(['delete_record', 'edit_record', 'added', 'updated', '_wpnonce']));
+        if (wp_verify_nonce(sanitize_text_field($_GET['_wpnonce']), 'delete_record_' . $record_id)) {
+            $wpdb->delete(esc_sql($table_name), [$primary_key => $record_id], ['%d']);
+            $redirect_url = remove_query_arg(['delete_record', 'edit_record', 'added', 'updated', '_wpnonce']);
+            wp_safe_redirect($redirect_url);
             exit;
         }
     }
 
     // Process form submissions with nonce verification
     if (!empty($_POST) && isset($_POST['form_type'], $_POST['crud_nonce'])) {
-        if ($_POST['form_type'] === 'data_form' && wp_verify_nonce($_POST['crud_nonce'], 'crud_form_nonce')) {
+        if ($_POST['form_type'] === 'data_form' && wp_verify_nonce(sanitize_text_field($_POST['crud_nonce']), 'crud_form_nonce')) {
             $data = [];
             $format = [];
             $has_error = false;
@@ -280,16 +298,32 @@ function generic_table_manager_shortcode($config) {
             } else {
                 if (isset($_POST['update_record'])) {
                     $record_id = intval($_POST['record_id']);
-                    $wpdb->update($table_name, $data, [$primary_key => $record_id], $format, ['%d']);
-                    wp_redirect(add_query_arg('updated', '1', remove_query_arg(['edit_record', '_wpnonce'])));
+                    $wpdb->update(
+                        esc_sql($table_name), 
+                        $data, 
+                        [$primary_key => $record_id], 
+                        $format, 
+                        ['%d']
+                    );
+                    $redirect_url = add_query_arg(
+                        'updated', 
+                        '1', 
+                        remove_query_arg(['edit_record', '_wpnonce'])
+                    );
+                    wp_safe_redirect($redirect_url);
                     exit;
                 } else {
-                    $wpdb->insert($table_name, $data, $format);
-                    wp_redirect(add_query_arg('added', '1', remove_query_arg('_wpnonce', $_SERVER['REQUEST_URI'])));
+                    $wpdb->insert(esc_sql($table_name), $data, $format);
+                    $redirect_url = add_query_arg(
+                        'added', 
+                        '1', 
+                        remove_query_arg('_wpnonce', $_SERVER['REQUEST_URI'])
+                    );
+                    wp_safe_redirect($redirect_url);
                     exit;
                 }
             }
-        } else if ($_POST['form_type'] === 'pagination' && wp_verify_nonce($_POST['pagination_nonce'], 'pagination_nonce')) {
+        } else if ($_POST['form_type'] === 'pagination' && wp_verify_nonce(sanitize_text_field($_POST['pagination_nonce']), 'pagination_nonce')) {
             // Pagination form is valid, continue processing
         }
     }
@@ -297,9 +331,12 @@ function generic_table_manager_shortcode($config) {
     // Process edit with nonce verification
     if (isset($_GET['edit_record'], $_GET['_wpnonce'])) {
         $record_id = intval($_GET['edit_record']);
-        if (wp_verify_nonce($_GET['_wpnonce'], 'edit_record_' . $record_id)) {
+        if (wp_verify_nonce(sanitize_text_field($_GET['_wpnonce']), 'edit_record_' . $record_id)) {
             $editing = true;
-            $edit_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM " . esc_sql($table_name) . " WHERE " . esc_sql($primary_key) . " = %d", $record_id));
+            $edit_data = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM " . esc_sql($table_name) . " WHERE " . esc_sql($primary_key) . " = %d", 
+                $record_id
+            ));
         }
     }
 
@@ -378,8 +415,12 @@ function generic_table_manager_shortcode($config) {
         }
     }
     
-    $total_text = sprintf(esc_html__('Records: %d', 'custom-table-crud'), $total);
-    echo '<div style="margin: 10px 0; font-weight: bold;">' . esc_html($total_text) . '</div>';
+    $total_text = sprintf(
+        // translators: %d is the number of records found
+        esc_html__('Records: %d', 'custom-table-crud'), 
+        $total
+    );
+    echo '<div style="margin: 10px 0; font-weight: bold;">' . $total_text . '</div>';
 
     echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-table-crud') . '" />';
     echo '<input type="submit" value="' . esc_attr__('Search', 'custom-table-crud') . '" />';
@@ -400,7 +441,9 @@ function generic_table_manager_shortcode($config) {
             echo render_table_row($row, $columns, $primary_key);
         }
     } else {
-        echo '<tr><td colspan="' . (count($columns) + 2) . '">' . esc_html__('No records found.', 'custom-table-crud') . '</td></tr>';
+        // translators: Text shown when no records are found
+        $no_records_text = __('No records found.', 'custom-table-crud');
+        echo '<tr><td colspan="' . (count($columns) + 2) . '">' . esc_html($no_records_text) . '</td></tr>';
     }
     
     echo '</table>';
