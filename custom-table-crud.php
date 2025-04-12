@@ -2,14 +2,12 @@
 /**
  * Plugin Name: Custom Table CRUD with Debug + Pagination Fix
  * Description: CRUD for custom DB tables with working pagination inside shortcodes.
- * Version: 1.3
+ * Version: 1.4
  * Author: affigabmag
  */
 
-add_shortcode('wp_books_manager', 'wp_books_manager_shortcode');
-add_shortcode('wp_warranties_manager', 'wp_warranties_manager_shortcode');
-
-function wp_books_manager_shortcode() {
+add_shortcode('wp_books_manager', function ($atts = []) {
+    $atts = shortcode_atts(['pagination' => 5], $atts);
     return generic_table_manager_shortcode([
         'table_name'  => 'app_books',
         'primary_key' => 'id',
@@ -17,11 +15,13 @@ function wp_books_manager_shortcode() {
             'bookname'    => ['label' => 'Book Name', 'type' => 'text'],
             'price'       => ['label' => 'Price', 'type' => 'number'],
             'description' => ['label' => 'Description', 'type' => 'textarea']
-        ]
+        ],
+        'pagination' => intval($atts['pagination'])
     ]);
-}
+});
 
-function wp_warranties_manager_shortcode() {
+add_shortcode('wp_warranties_manager', function ($atts = []) {
+    $atts = shortcode_atts(['pagination' => 5], $atts);
     return generic_table_manager_shortcode([
         'table_name'  => 'app_warranties',
         'primary_key' => 'id',
@@ -29,9 +29,10 @@ function wp_warranties_manager_shortcode() {
             'ProductName'     => ['label' => 'Product Name', 'type' => 'text'],
             'DateOfPurchase'  => ['label' => 'Date of Purchase', 'type' => 'date'],
             'Notes'           => ['label' => 'Notes', 'type' => 'textarea']
-        ]
+        ],
+        'pagination' => intval($atts['pagination'])
     ]);
-}
+});
 
 function render_pagination_controls($page, $total, $per_page) {
     $total_pages = ceil($total / $per_page);
@@ -52,12 +53,24 @@ function render_pagination_controls($page, $total, $per_page) {
     return $output;
 }
 
+function render_table_row($row, $columns, $primary_key) {
+    $output = '<tr>';
+    foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
+        $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
+    }
+    $output .= '<td><a href="' . esc_url(add_query_arg('edit_record', $row->$primary_key)) . '">Edit</a> | ';
+    $output .= '<a href="' . esc_url(add_query_arg('delete_record', $row->$primary_key)) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
+    $output .= '</tr>';
+    return $output;
+}
+
 function generic_table_manager_shortcode($config) {
     global $wpdb;
 
     $table_name  = $config['table_name'];
     $primary_key = $config['primary_key'];
     $columns     = $config['columns'];
+    $per_page    = isset($config['pagination']) && intval($config['pagination']) > 0 ? intval($config['pagination']) : 5;
     $editing     = false;
     $edit_data   = null;
 
@@ -109,7 +122,6 @@ function generic_table_manager_shortcode($config) {
     }
     $query .= " ORDER BY $order_by $order_dir";
 
-    $per_page = 5;
     $page = isset($_POST['paged']) ? max(1, intval($_POST['paged'])) : (isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1);
     $offset = ($page - 1) * $per_page;
 
@@ -164,13 +176,7 @@ function generic_table_manager_shortcode($config) {
     echo '<th>Actions</th></tr>';
 
     foreach ($rows as $row) {
-        echo '<tr>';
-        foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
-            echo '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
-        }
-        echo '<td><a href="' . esc_url(add_query_arg('edit_record', $row->$primary_key)) . '">Edit</a> | ';
-        echo '<a href="' . esc_url(add_query_arg('delete_record', $row->$primary_key)) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
-        echo '</tr>';
+        echo render_table_row($row, $columns, $primary_key);
     }
     echo '</table>';
 
