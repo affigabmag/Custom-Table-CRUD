@@ -32,10 +32,13 @@ function generateShortcode() {
             const fieldname = checkbox.value;
             const displayname = wrap.querySelector("input[name^=displayname_]").value || fieldname;
             const displaytype = wrap.querySelector("select[name^=type_]").value;
-            fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}"`;
+            const readonlyCheckbox = wrap.querySelector("input[name^=readonly_]");
+            const readonly = readonlyCheckbox && readonlyCheckbox.checked ? ";readonly=true" : "";
+            fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}${readonly}"`;
             fieldIndex++;
         }
     });
+    
     
     const shortcode = `[wp_table_manager pagination="${pagination}" table_view="${table}" showrecordscount="${showRecords}"${fieldsText}]`;
 

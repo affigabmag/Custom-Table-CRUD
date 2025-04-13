@@ -84,10 +84,12 @@ function handle_wp_table_manager_shortcode($atts = []) {
             }
             if (!empty($col['fieldname']) && !empty($col['displayname']) && !empty($col['displaytype'])) {
                 $columns[$col['fieldname']] = [
-                    'label' => $col['displayname'],
-                    'type'  => $col['displaytype']
+                    'label'    => $col['displayname'],
+                    'type'     => $col['displaytype'],
+                    'readonly' => isset($col['readonly']) && $col['readonly'] === 'true' ? 'true' : 'false'
                 ];
             }
+            
         }
     }
 
@@ -199,10 +201,10 @@ add_action('wp_ajax_get_table_fields', function() {
     if (!$table) {
         wp_die();
     }
-    
+
     // Use prepared statement for security
-    $columns = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM %i", $table));
-    
+    $columns = $wpdb->get_results($wpdb->prepare("SHOW COLUMNS FROM `$table`"));  // Use backticks to avoid injection
+
     if (!$columns) {
         wp_die();
     }
@@ -217,16 +219,22 @@ add_action('wp_ajax_get_table_fields', function() {
         echo '<div class="field-wrapper">';
         echo '<label><input type="checkbox" class="field-checkbox" value="' . esc_attr($name) . '" checked> ' . esc_html($name) . '</label><br>';
         echo 'Display Name: <input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" style="width:150px;"> ';
-        echo 'Type: <select name="type_' . esc_attr($name) . '">' ;
+        echo 'Type: ';
+        echo '<select name="type_' . esc_attr($name) . '">';
         $types = ['text','number','date','datetime','textarea','email','url','tel','password'];
         foreach ($types as $t) {
             echo '<option value="' . esc_attr($t) . '"' . ($type == $t ? ' selected' : '') . '>' . esc_html($t) . '</option>';
         }
         echo '</select>';
+        echo '<label style="margin-left: 10px;">';
+        echo '<input type="checkbox" name="readonly_' . esc_attr($name) . '" class="readonly-checkbox" value="1" style="margin-left: 8px;">';
+        echo ' Read Only</label>';
         echo '</div>';
     }
-    wp_die();
+
+    wp_die(); // important!
 });
+
 
 function render_table_row($row, $columns, $primary_key) {
     $output = '<tr>';
@@ -313,10 +321,10 @@ function generic_table_manager_shortcode($config) {
 
                 $data[$field] = $value;
                 $format[] = (is_numeric($value) && strpos($value, '.') !== false) ? '%f' : '%s';
-
-                if ($value === '') {
+                if ($value === '' && (!isset($meta['readonly']) || $meta['readonly'] !== 'true')) {
                     $has_error = true;
                 }
+                
             }
 
             if ($has_error) {
@@ -386,28 +394,32 @@ function generic_table_manager_shortcode($config) {
     if ($editing && $edit_data) echo '<input type="hidden" name="record_id" value="' . esc_attr($edit_data->$primary_key) . '">';
 
     foreach ($columns as $field => $meta) {
-        $label = $meta['label'];
-        $type  = $meta['type'];
+        $label = isset($meta['label']) ? $meta['label'] : $field;
+        $type = isset($meta['type']) ? $meta['type'] : 'text';
+        $readonly = isset($meta['readonly']) && $meta['readonly'] === 'true';
         $value = $_POST[$field] ?? ($editing && isset($edit_data->$field) ? $edit_data->$field : '');
         $error = isset($_POST['form_type'], $_POST[$field]) && trim($_POST[$field]) === '';
-
+    
         echo '<p><label>' . esc_html($label) . ':</label><br>';
-        if ($type === 'textarea') {
+    
+        if ($readonly) {
+            echo '<div style="padding:10px; border:1px solid #ccc; background:#f9f9f9; border-radius:6px; width:100%; max-width:500px; font-size:15px; margin-bottom: 10px;">' . esc_html($value) . '</div>';
+            echo '<input type="hidden" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '">';
+        } elseif ($type === 'textarea') {
             echo '<textarea name="' . esc_attr($field) . '" rows="3" required>' . esc_textarea($value) . '</textarea>';
         } else {
-            $step = $type === 'number' ? ' step="any"' : '';
-            $pattern = '';
-            if ($type === 'url') {
-                $pattern = ' pattern="https?://.+"';
-            }
+            $step = ($type === 'number') ? ' step="any"' : '';
+            $pattern = ($type === 'url') ? ' pattern="https?://.+"' : '';
             echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . $pattern . '>';
-
         }
+    
         if ($error) {
-            echo '<br><small class="error-message">' . esc_html__('This field is required.', 'custom-crud') . '</small>';
+            echo '<br><small class="error-message">This field is required.</small>';
         }
+    
         echo '</p>';
     }
+    
 
     echo '<p><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-crud') : __('Add', 'custom-crud')) . '">';
     if ($editing) echo ' <a href="' . esc_url(remove_query_arg(['edit_record', '_wpnonce'])) . '">' . esc_html__('Cancel', 'custom-crud') . '</a>';
