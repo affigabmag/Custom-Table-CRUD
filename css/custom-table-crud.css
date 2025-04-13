@@ -217,3 +217,67 @@ input[type="number"]#pagination {
     border-radius: 6px;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
 }
+
+form > p {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  
+  form > p > label {
+    min-width: 100px;
+    margin: 0;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  
+  form > p > input,
+  form > p > textarea,
+  form > p > select {
+    flex: 1;
+    margin: 0;
+    max-width: 500px;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  form input[type="submit"][name="add_record"] {
+    background-color: #0073aa;
+    color: white;
+    padding: 0 16px;
+    height: 40px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 90px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .crud-submit-btn {
+    background-color: #0073aa;
+    color: white;
+    padding: 0 16px;
+    height: 40px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 90px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .crud-submit-btn:hover {
+    background-color: #005d87;
+  }
+  

@@ -173,12 +173,19 @@ function custom_crud_dashboard_page() {
     echo '<br><label for="pagination"><strong>Pagination:</strong></label><br>';
     echo '<input type="number" id="pagination" name="pagination" value="5" style="width: 100px;"><br><br>';
 
-    echo '<label><input type="checkbox" id="showrecordscount" checked> Show Records Count</label><br><br>';
-
+    echo '<label><input type="checkbox" id="showrecordscount" checked> Show Records Count</label><br>';
+    echo '<div class="custom-ui-options" style="margin-bottom: 10px;">';
+    echo '<label><input type="checkbox" id="show_form" checked> Entry fields</label><br>';
+    echo '<label><input type="checkbox" id="show_table" checked> Table</label><br>';
+    echo '<label><input type="checkbox" id="show_search" checked> Search box</label><br>';
+    echo '<label><input type="checkbox" id="show_pagination" checked> Pagination</label><br>';
+    echo '<label><input type="checkbox" id="showrecordscount" checked> Records Count</label><br>';
+    echo '</div>';
+    
 
     if (!empty($selected_table)) {
         echo '<div style="display: flex; align-items: center; gap: 10px;">';
-        echo '<button type="submit" class="button button-primary">Generate Shortcode</button>';
+        echo '<button type="button" class="button button-primary" onclick="generateShortcode()">Generate Shortcode</button>';
         echo '<span id="copy-message">Copied to clipboard!</span>';
         echo '</div><br><br>';
 
@@ -188,6 +195,9 @@ function custom_crud_dashboard_page() {
 
     echo '</form>';
     echo '</div>';
+
+
+
 }
 
 add_action('wp_ajax_get_table_fields', function() {
@@ -410,11 +420,13 @@ function generic_table_manager_shortcode($config) {
         $value = $_POST[$field] ?? ($editing && isset($edit_data->$field) ? $edit_data->$field : '');
         $error = isset($_POST['form_type'], $_POST[$field]) && trim($_POST[$field]) === '';
     
-        echo '<p><label>' . esc_html($label) . ':</label><br>';
-    
+        echo '<p>';
+        echo '<label for="' . esc_attr($field) . '">' . esc_html($label) . ':</label>';
+            
         if ($readonly) {
-            echo '<div style="padding:10px; border:1px solid #ccc; background:#f9f9f9; border-radius:6px; width:100%; max-width:500px; font-size:15px; margin-bottom: 10px;">' . esc_html($value) . '</div>';
+            echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" readonly disabled>';
             echo '<input type="hidden" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '">';
+        
         } elseif ($type === 'textarea') {
             echo '<textarea name="' . esc_attr($field) . '" rows="3" required>' . esc_textarea($value) . '</textarea>';
         } else {
@@ -431,7 +443,8 @@ function generic_table_manager_shortcode($config) {
     }
     
 
-    echo '<p><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-crud') : __('Add', 'custom-crud')) . '">';
+    echo '<div class="wp-books-toolbar"><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-crud') : __('Add', 'custom-crud')) . '" class="crud-submit-btn"></div>';
+
     if ($editing) echo ' <a href="' . esc_url(remove_query_arg(['edit_record', '_wpnonce'])) . '">' . esc_html__('Cancel', 'custom-crud') . '</a>';
     echo '</p></form>';
 

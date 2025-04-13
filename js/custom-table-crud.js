@@ -19,7 +19,8 @@ function loadFields(tableName) {
 // Generate shortcode from form data
 function generateShortcode() {
     const table = document.getElementById("table_view").value;
-    const pagination = document.getElementById("pagination").value;
+    const pagination = document.getElementById("pagination")?.value || 5;
+
     const showRecords = document.getElementById("showrecordscount").checked ? "true" : "false";
 
     const wrappers = document.querySelectorAll(".field-wrapper");
@@ -40,17 +41,40 @@ function generateShortcode() {
     });
     
     
-    const shortcode = `[wp_table_manager pagination="${pagination}" table_view="${table}" showrecordscount="${showRecords}"${fieldsText}]`;
+
+    const showRecordsCount = document.getElementById("showrecordscount")?.checked ? "true" : "false";
+    const showForm = document.getElementById("show_form")?.checked ? "true" : "false";
+    const showTable = document.getElementById("show_table")?.checked ? "true" : "false";
+    const showSearch = document.getElementById("show_search")?.checked ? "true" : "false";
+    const showPagination = document.getElementById("show_pagination")?.checked ? "true" : "false";
+    const tableName = document.getElementById("table_view")?.value || "";
+
+    let shortcode = `[wp_table_manager pagination="${pagination}" table_view="${tableName}" showrecordscount="${showRecordsCount}" showform="${showForm}" showtable="${showTable}" showsearch="${showSearch}" showpagination="${showPagination}"${fieldsText}]`;
+    
+
+    document.getElementById("shortcode_output").value = shortcode;
 
     const textarea = document.getElementById("shortcode_output");
-    textarea.value = shortcode;
     textarea.select();
-    textarea.setSelectionRange(0, 99999);
+    textarea.setSelectionRange(0, 99999); // For mobile devices
     document.execCommand("copy");
     
+    // Show "Copied!" message if it exists
     const msg = document.getElementById("copy-message");
-    msg.style.display = "inline";
-    setTimeout(() => { msg.style.display = "none"; }, 3000);
+    if (msg) {
+        msg.style.display = "inline";
+        setTimeout(() => { msg.style.display = "none"; }, 3000);
+    }
+    
+
+    // textarea.value = shortcode;
+    // textarea.select();
+    // textarea.setSelectionRange(0, 99999);
+    // document.execCommand("copy");
+    
+    // const msg = document.getElementById("copy-message");
+    // msg.style.display = "inline";
+    // setTimeout(() => { msg.style.display = "none"; }, 3000);
 }
 
 // Initialize event listeners when DOM is loaded
