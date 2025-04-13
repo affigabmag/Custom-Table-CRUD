@@ -1,77 +1,45 @@
-# Custom Table CRUD Plugin
+# Custom Table CRUD with Debug + Pagination Fix
 
-A flexible **WordPress plugin** that allows CRUD (Create, Read, Update, Delete) operations on **custom database tables** using dynamic shortcodes and a user-friendly admin dashboard.
+A WordPress plugin for CRUD operations on custom database tables with working pagination inside shortcodes.
 
----
+## File Structure
 
-## 🚀 Features
-
-- 🔹 CRUD for any custom database table
-- 🔹 Select any table from the database via dropdown
-- 🔹 Choose and name which fields to include
-- 🔹 Assign a type to each field (text, textarea, number, date, etc.)
-- 🔹 Front-end forms powered by shortcodes
-- 🔹 Admin dashboard panel for shortcode generation
-- 🔹 Supports pagination, search, and sorting
-- 🔹 Lightweight, no external dependencies
-
----
-
-## ⚙️ Installation
-
-1. Clone or download this repo into your WordPress `wp-content/plugins/` directory  
-2. Ensure your desired table exists in the MySQL database  
-3. Activate the plugin from the WordPress admin  
-4. Navigate to **Custom Crud** in the admin menu  
-5. Use the GUI to generate your shortcode
-6. Paste the shortcode into any post or page
-
----
-
-## 🧪 Supported Field Types
-
-- `text` – Single-line text input
-- `textarea` – Multi-line input
-- `number` – Numeric input
-- `date` – Date picker
-- `datetime` – Date & time picker
-- `email` – Email input
-- `url` – URL input
-- `tel` – Telephone input
-- `password` – Password input
-
----
-
-## ✨ Shortcode Format
-
-The plugin dynamically creates shortcodes like:
-
-```txt
-[wp_table_manager pagination="6" table_view="your_table_name"
- field1="fieldname=your_column;displayname=Your Label;displaytype=text"
- field2="fieldname=another_column;displayname=Label 2;displaytype=number"]
+```
+custom-table-crud/
+├── css/
+│   └── custom-table-crud.css
+├── js/
+│   └── custom-table-crud.js
+├── custom-table-crud.php
+└── README.md
 ```
 
-Use the admin panel to generate this easily without writing code.
+## Installation
 
----
+1. Upload the `custom-table-crud` folder to the `/wp-content/plugins/` directory
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Go to the 'Custom Crud' menu in your WordPress admin panel
 
-## 📋 Example Use Case
+## Usage
 
-1. You create a table named `app_books` in your database.
-2. Use the plugin dashboard to select that table.
-3. Choose `bookname`, `price`, and `description` fields.
-4. Assign display types (e.g., `text`, `number`, `textarea`).
-5. Copy the generated shortcode and paste into a page.
-6. Done! You have a frontend CRUD interface for books.
+1. Navigate to the Custom Crud dashboard in your WordPress admin menu
+2. Select a table from the list of available tables
+3. Configure the fields you want to display
+4. Configure pagination options
+5. Generate a shortcode to display the table data on your site
+6. Use the generated shortcode in your posts or pages
 
----
+## Shortcode Example
 
-## 🙌 Author
-Developed by **affigabmag**
+```
+[wp_table_manager pagination="5" table_view="wp_posts" field1="fieldname=post_title;displayname=Title;displaytype=text" field2="fieldname=post_content;displayname=Content;displaytype=textarea"]
+```
 
----
+## Features
 
-## 📄 License
-This project is licensed under the MIT License.
-
+- CRUD operations for any database table
+- Shortcode generator for easy implementation
+- Customizable field display options
+- Pagination support
+- Search and sorting functionality
+- Responsive design

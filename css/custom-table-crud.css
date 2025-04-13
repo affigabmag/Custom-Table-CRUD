@@ -1,0 +1,54 @@
+.wp-books-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.wp-books-table th, .wp-books-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.wp-books-table th {
+    background: #f0f0f0;
+}
+
+/* Dashboard table styles */
+.selected {
+    background-color: #e0f7fa;
+}
+
+/* Field wrapper styles */
+.field-wrapper {
+    margin-bottom: 8px;
+}
+
+/* Success and error messages */
+.success-message {
+    color: green;
+}
+
+.error-message {
+    color: red;
+}
+
+/* Copy message styling */
+#copy-message {
+    color: green;
+    display: none;
+}
+
+/* Shortcode output textarea */
+#shortcode_output {
+    width: 100%;
+    height: 120px;
+}
+
+/* Table selection container */
+.table-selection-container {
+    height: 300px;
+    overflow-y: auto;
+    width: 50%;
+    margin-bottom: 20px;
+}

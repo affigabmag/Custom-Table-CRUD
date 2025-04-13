@@ -1,0 +1,204 @@
+
+==== [2025-04-13 07:40:25] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 07:40:26] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 07:40:48] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 07:40:48] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 07:41:29] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 07:41:29] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)

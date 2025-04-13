@@ -4,7 +4,41 @@
  * Description: CRUD for custom DB tables with working pagination inside shortcodes.
  * Version: 1.5
  * Author: affigabmag
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: custom-table-crud
+ * Stable tag: 1.5
  */
+
+// Prevent direct access
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Create necessary directories on plugin activation
+register_activation_hook(__FILE__, 'custom_table_crud_activate');
+
+function custom_table_crud_activate() {
+    // Create css directory if it doesn't exist
+    $css_dir = plugin_dir_path(__FILE__) . 'css';
+    if (!file_exists($css_dir)) {
+        wp_mkdir_p($css_dir);
+    }
+    
+    // Create js directory if it doesn't exist
+    $js_dir = plugin_dir_path(__FILE__) . 'js';
+    if (!file_exists($js_dir)) {
+        wp_mkdir_p($js_dir);
+    }
+}
+
+// Enqueue CSS and JavaScript files
+function custom_table_crud_enqueue_scripts() {
+    wp_enqueue_style('custom-table-crud-style', plugin_dir_url(__FILE__) . 'css/custom-table-crud.css', array(), '1.5');
+    wp_enqueue_script('custom-table-crud-script', plugin_dir_url(__FILE__) . 'js/custom-table-crud.js', array('jquery'), '1.5', true);
+}
+add_action('admin_enqueue_scripts', 'custom_table_crud_enqueue_scripts');
+add_action('wp_enqueue_scripts', 'custom_table_crud_enqueue_scripts');
 
 // Register the shortcode on init to allow dynamic attributes
 function register_wp_table_manager_shortcode() {
@@ -59,7 +93,7 @@ function handle_wp_table_manager_shortcode($atts = []) {
     file_put_contents($log_file, $log_data, FILE_APPEND);
 
     if (empty($columns)) {
-        return '<div style="color:red;">⚠️ No valid fields defined in shortcode.</div>';
+        return '<div class="error-message">⚠️ No valid fields defined in shortcode.</div>';
     }
 
     return generic_table_manager_shortcode([
@@ -84,79 +118,66 @@ add_action('admin_menu', function() {
 function custom_crud_dashboard_page() {
     global $wpdb;
     $tables = $wpdb->get_col("SHOW TABLES");
+    $selected_table = isset($_GET['table']) ? sanitize_text_field($_GET['table']) : '';
 
     echo '<div class="wrap">';
     echo '<h1>Custom Crud - Dashboard</h1>';
     echo '<p>Welcome to your custom CRUD dashboard.</p>';
 
+    // Display tables with record counts in a 2-column table with selection capability
+    echo '<h2>Available Tables</h2>';
+    echo '<div class="table-selection-container">';
+    echo '<table class="wp-list-table widefat fixed striped">';
+    echo '<thead><tr><th>Table Name</th><th>Number of Records</th></tr></thead>';
+    echo '<tbody>';
+    
+    foreach ($tables as $table) {
+        $record_count = $wpdb->get_var("SELECT COUNT(*) FROM " . esc_sql($table));
+        $is_selected = ($selected_table === $table) ? ' class="selected"' : '';
+        echo '<tr' . $is_selected . '>';
+        echo '<td><a href="' . esc_url(add_query_arg('table', $table)) . '" style="text-decoration: none; display: block;">' . 
+             esc_html($table) . '</a></td>';
+        echo '<td>' . esc_html($record_count) . '</td>';
+        echo '</tr>';
+    }
+    
+    echo '</tbody></table>';
+    echo '</div>';
+
+    // Form for shortcode generation
     echo '<form method="post" onsubmit="generateShortcode(); return false;">';
     wp_nonce_field('custom_crud_form', 'custom_crud_nonce');
 
-    echo '<label for="table_view"><strong>Select Table:</strong></label><br>';
-    echo '<select id="table_view" name="table_view" style="width: 300px;" onchange="loadFields(this.value)">';
-    echo '<option value="">-- Select Table --</option>';
-    foreach ($tables as $table) {
-        echo '<option value="' . esc_attr($table) . '">' . esc_html($table) . '</option>';
+    // Hidden field for selected table instead of dropdown
+    if (!empty($selected_table)) {
+        echo '<input type="hidden" id="table_view" name="table_view" value="' . esc_attr($selected_table) . '">';
+        echo '<h3>Selected Table: ' . esc_html($selected_table) . '</h3>';
+        echo '<div id="field_select_container"></div>';
+        
+        // Script for loading fields automatically moved to the enqueued JS file
+        echo '<script>
+            document.addEventListener("DOMContentLoaded", function() {
+                loadFields("' . esc_js($selected_table) . '");
+            });
+        </script>';
+    } else {
+        echo '<p>Please select a table from the list above</p>';
     }
-    echo '</select><br><br>';
-
-    echo '<div id="field_select_container"></div>';
 
     echo '<br><label for="pagination"><strong>Pagination:</strong></label><br>';
     echo '<input type="number" id="pagination" name="pagination" value="5" style="width: 100px;"><br><br>';
 
-    echo '<div style="display: flex; align-items: center; gap: 10px;">';
-    echo '<button type="submit" class="button button-primary">Generate Shortcode</button>';
-    echo '<span id="copy-message" style="color:green;display:none;">Copied to clipboard!</span>';
-    echo '</div><br><br>';
+    if (!empty($selected_table)) {
+        echo '<div style="display: flex; align-items: center; gap: 10px;">';
+        echo '<button type="submit" class="button button-primary">Generate Shortcode</button>';
+        echo '<span id="copy-message">Copied to clipboard!</span>';
+        echo '</div><br><br>';
 
-    echo '<h2>Generated Shortcode</h2>';
-    echo '<textarea id="shortcode_output" style="width:100%;height:120px;"></textarea>';
+        echo '<h2>Generated Shortcode</h2>';
+        echo '<textarea id="shortcode_output"></textarea>';
+    }
 
     echo '</form>';
-
-    echo '<script>
-    function loadFields(tableName) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", ajaxurl);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                document.getElementById("field_select_container").innerHTML = xhr.responseText;
-            }
-        };
-        const nonce = document.getElementById("custom_crud_nonce").value;
-        xhr.send("action=get_table_fields&table=" + encodeURIComponent(tableName) + "&nonce=" + encodeURIComponent(nonce));
-    }
-
-    function generateShortcode() {
-        const table = document.getElementById("table_view").value;
-        const pagination = document.getElementById("pagination").value;
-        const wrappers = document.querySelectorAll(".field-wrapper");
-        let fieldIndex = 1;
-        let fieldsText = "";
-        wrappers.forEach(wrap => {
-            const checkbox = wrap.querySelector("input[type=checkbox]");
-            if (checkbox && checkbox.checked) {
-                const fieldname = checkbox.value;
-                const displayname = wrap.querySelector("input[name^=displayname_]").value || fieldname;
-                const displaytype = wrap.querySelector("select[name^=type_]").value;
-                fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}"`;
-                fieldIndex++;
-            }
-        });
-        const shortcode = `[wp_table_manager pagination="${pagination}" table_view="${table}"${fieldsText}]`;
-        const textarea = document.getElementById("shortcode_output");
-        textarea.value = shortcode;
-        textarea.select();
-        textarea.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-        const msg = document.getElementById("copy-message");
-        msg.style.display = "inline";
-        setTimeout(() => { msg.style.display = "none"; }, 3000);
-    }
-    </script>';
-
     echo '</div>';
 }
 
@@ -186,7 +207,7 @@ add_action('wp_ajax_get_table_fields', function() {
         elseif (strpos($col->Type, 'date') !== false) $type = 'date';
         elseif (strpos($col->Type, 'text') !== false) $type = 'textarea';
 
-        echo '<div class="field-wrapper" style="margin-bottom:8px;">';
+        echo '<div class="field-wrapper">';
         echo '<label><input type="checkbox" class="field-checkbox" value="' . esc_attr($name) . '" checked> ' . esc_html($name) . '</label><br>';
         echo 'Display Name: <input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" style="width:150px;"> ';
         echo 'Type: <select name="type_' . esc_attr($name) . '">' ;
@@ -205,8 +226,8 @@ function render_table_row($row, $columns, $primary_key) {
     foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
         $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
     }
-    $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">' . esc_html__('Edit', 'custom-crud') . '</a> | ';
-    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'' . esc_js(__('Are you sure?', 'custom-crud')) . '\');">' . esc_html__('Delete', 'custom-crud') . '</a></td>';
+    $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">Edit</a> | ';
+    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
     $output .= '</tr>';
     return $output;
 }
@@ -270,7 +291,7 @@ function generic_table_manager_shortcode($config) {
             }
 
             if ($has_error) {
-                $error_message = '<p style="color:red;">⚠️ ' . esc_html__('All fields are required.', 'custom-crud') . '</p>';
+                $error_message = '<p class="error-message">⚠️ ' . esc_html__('All fields are required.', 'custom-crud') . '</p>';
             } else {
                 if (isset($_POST['update_record'])) {
                     $record_id = intval($_POST['record_id']);
@@ -328,13 +349,9 @@ function generic_table_manager_shortcode($config) {
     echo '<form method="post">';
     echo '<input type="hidden" name="form_type" value="data_form">';
     echo wp_nonce_field('crud_form_nonce', 'crud_nonce', true, false);
-    
-    echo '<style>.wp-books-table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    .wp-books-table th, .wp-books-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    .wp-books-table th { background: #f0f0f0; }</style>';
 
-    if (isset($_GET['added'])) echo '<p style="color:green;">✅ ' . esc_html__('Record added successfully!', 'custom-crud') . '</p>';
-    if (isset($_GET['updated'])) echo '<p style="color:green;">✅ ' . esc_html__('Record updated successfully!', 'custom-crud') . '</p>';
+    if (isset($_GET['added'])) echo '<p class="success-message">✅ ' . esc_html__('Record added successfully!', 'custom-crud') . '</p>';
+    if (isset($_GET['updated'])) echo '<p class="success-message">✅ ' . esc_html__('Record updated successfully!', 'custom-crud') . '</p>';
     if (isset($error_message)) echo $error_message;
 
     if ($editing && $edit_data) echo '<input type="hidden" name="record_id" value="' . esc_attr($edit_data->$primary_key) . '">';
@@ -353,7 +370,7 @@ function generic_table_manager_shortcode($config) {
             echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . '>';
         }
         if ($error) {
-            echo '<br><small style="color:red;">' . esc_html__('This field is required.', 'custom-crud') . '</small>';
+            echo '<br><small class="error-message">' . esc_html__('This field is required.', 'custom-crud') . '</small>';
         }
         echo '</p>';
     }
