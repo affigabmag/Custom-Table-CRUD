@@ -50,7 +50,9 @@ function handle_wp_table_manager_shortcode($atts = []) {
     $defaults = [
         'pagination' => 5,
         'table_view' => '',
+        'showrecordscount' => 'true',
     ];
+    
 
     foreach ($atts as $key => $val) {
         if (preg_match('/^field\d+$/', $key)) {
@@ -97,11 +99,13 @@ function handle_wp_table_manager_shortcode($atts = []) {
     }
 
     return generic_table_manager_shortcode([
-        'table_name'  => $atts['table_view'],
-        'primary_key' => 'id',
-        'columns'     => $columns,
-        'pagination'  => intval($atts['pagination'])
+        'table_name'        => $atts['table_view'],
+        'primary_key'       => 'id',
+        'columns'           => $columns,
+        'pagination'        => intval($atts['pagination']),
+        'showrecordscount'  => strtolower($atts['showrecordscount']) === 'false' ? 'false' : 'true',
     ]);
+    
 }
 
 add_action('admin_menu', function() {
@@ -166,6 +170,9 @@ function custom_crud_dashboard_page() {
 
     echo '<br><label for="pagination"><strong>Pagination:</strong></label><br>';
     echo '<input type="number" id="pagination" name="pagination" value="5" style="width: 100px;"><br><br>';
+
+    echo '<label><input type="checkbox" id="showrecordscount" checked> Show Records Count</label><br><br>';
+
 
     if (!empty($selected_table)) {
         echo '<div style="display: flex; align-items: center; gap: 10px;">';
@@ -406,9 +413,11 @@ function generic_table_manager_shortcode($config) {
         }
     }
     
-    $total_text = sprintf(esc_html__('Records: %d', 'custom-crud'), $total);
+    if (!isset($config['showrecordscount']) || $config['showrecordscount'] === 'true') {
+        $total_text = sprintf(esc_html__('Records: %d', 'custom-crud'), $total);
+        echo '<div class="records-count">' . esc_html($total_text) . '</div>';
+    }
     echo '<div class="wp-books-toolbar">';
-    echo '<div class="records-count">' . esc_html($total_text) . '</div>';
     echo '<div class="search-form">';
     echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-crud') . '" />';
     echo '<input type="submit" value="' . esc_attr__('Search', 'custom-crud') . '" />';

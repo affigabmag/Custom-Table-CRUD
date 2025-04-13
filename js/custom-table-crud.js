@@ -20,6 +20,8 @@ function loadFields(tableName) {
 function generateShortcode() {
     const table = document.getElementById("table_view").value;
     const pagination = document.getElementById("pagination").value;
+    const showRecords = document.getElementById("showrecordscount").checked ? "true" : "false";
+
     const wrappers = document.querySelectorAll(".field-wrapper");
     let fieldIndex = 1;
     let fieldsText = "";
@@ -35,7 +37,8 @@ function generateShortcode() {
         }
     });
     
-    const shortcode = `[wp_table_manager pagination="${pagination}" table_view="${table}"${fieldsText}]`;
+    const shortcode = `[wp_table_manager pagination="${pagination}" table_view="${table}" showrecordscount="${showRecords}"${fieldsText}]`;
+
     const textarea = document.getElementById("shortcode_output");
     textarea.value = shortcode;
     textarea.select();
