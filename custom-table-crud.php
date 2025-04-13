@@ -224,7 +224,8 @@ add_action('wp_ajax_get_table_fields', function() {
 function render_table_row($row, $columns, $primary_key) {
     $output = '<tr>';
     foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
-        $output .= '<td>' . (isset($row->$field) ? nl2br(esc_html($row->$field)) : '') . '</td>';
+        $output .= '<td>' . (isset($row->$field) ? nl2br(htmlspecialchars_decode(esc_html($row->$field))) : '') . '</td>';
+
     }
     $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">Edit</a> | ';
     $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
@@ -281,7 +282,8 @@ function generic_table_manager_shortcode($config) {
 
             foreach ($columns as $field => $meta) {
                 $raw = $_POST[$field] ?? '';
-                $value = ($meta['type'] === 'textarea') ? sanitize_textarea_field($raw) : sanitize_text_field($raw);
+                $value = wp_unslash(($meta['type'] === 'textarea') ? sanitize_textarea_field($raw) : sanitize_text_field($raw));
+
                 $data[$field] = $value;
                 $format[] = (is_numeric($value) && strpos($value, '.') !== false) ? '%f' : '%s';
 
