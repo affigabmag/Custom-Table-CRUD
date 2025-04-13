@@ -1426,3 +1426,1499 @@ Array
         )
 
 )
+
+==== [2025-04-13 08:24:46] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:26:29] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:26:32] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:26:38] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:26:40] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:26:44] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:26:46] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:28:42] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:28:48] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:28:54] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:28:58] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:29:04] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:29:16] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:30:20] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:31:19] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:31:22] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:32:20] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:32:23] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:33:38] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:33:42] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:34:46] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:34:48] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:34:49] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:36:02] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:36:21] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:36:24] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:36:26] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:39:40] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:41:56] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:46:04] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:46:14] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:48:54] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:48:55] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:01] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:04] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:10] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:13] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:19] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:19] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:22] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:25] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:25] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:29] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)
+
+==== [2025-04-13 08:49:29] ====
+[SHORTCODE ATTRIBUTES PARSED]
+Array
+(
+    [pagination] => 5
+    [table_view] => app_books
+    [field1] => fieldname=bookbame;displayname=bookbame;displaytype=text
+    [field2] => fieldname=price;displayname=price;displaytype=number
+    [field3] => fieldname=notes;displayname=notes;displaytype=textarea
+)
+
+[PARSED COLUMNS]
+Array
+(
+    [bookbame] => Array
+        (
+            [label] => bookbame
+            [type] => text
+        )
+
+    [price] => Array
+        (
+            [label] => price
+            [type] => number
+        )
+
+    [notes] => Array
+        (
+            [label] => notes
+            [type] => textarea
+        )
+
+)

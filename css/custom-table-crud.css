@@ -42,8 +42,16 @@
 /* Shortcode output textarea */
 #shortcode_output {
     width: 100%;
+    max-width: 800px;  /* Match the main content/table width */
     height: 120px;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
+
 
 /* Table selection container */
 .table-selection-container {
@@ -113,4 +121,99 @@ form a.button-cancel {
 
 form a.button-cancel:hover {
     background-color: #888;
+}
+
+.wp-books-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.wp-books-toolbar .records-count {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.wp-books-toolbar .search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Input field */
+.wp-books-toolbar .search-form input[type="text"] {
+    padding: 0 10px;
+    font-size: 14px;
+    height: 40px;
+    line-height: 40px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+
+/* Buttons: Search + Clear */
+.wp-books-toolbar input[type="submit"],
+.wp-books-toolbar .clear-link {
+    background-color: #0073aa;
+    color: white;
+    padding: 0 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    height: 40px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wp-books-toolbar input[type="submit"]:hover,
+.wp-books-toolbar .clear-link:hover {
+    background-color: #005d87;
+}
+
+.field-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: nowrap;
+}
+
+.field-wrapper input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+.field-wrapper > label {
+    margin: 0;
+    min-width: 100px;
+    white-space: nowrap;
+    height: 38px;              /* Match input/select height */
+    display: flex;
+    align-items: center;       /* Center text vertically */
+}
+
+
+.field-wrapper input[type="text"],
+.field-wrapper select {
+    height: 38px;
+    margin: 0;
+}
+
+input[type="number"]#pagination {
+    height: 38px;
+    line-height: 38px;
+    padding: 0 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
 }

@@ -390,11 +390,17 @@ function generic_table_manager_shortcode($config) {
     }
     
     $total_text = sprintf(esc_html__('Records: %d', 'custom-crud'), $total);
-    echo '<div style="margin: 10px 0; font-weight: bold;">' . esc_html($total_text) . '</div>';
-
+    echo '<div class="wp-books-toolbar">';
+    echo '<div class="records-count">' . esc_html($total_text) . '</div>';
+    echo '<div class="search-form">';
     echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-crud') . '" />';
     echo '<input type="submit" value="' . esc_attr__('Search', 'custom-crud') . '" />';
-    if ($search_term) echo ' <a href="' . esc_url(remove_query_arg('search')) . '">' . esc_html__('Clear', 'custom-crud') . '</a>';
+    if ($search_term) {
+        echo '<a class="clear-link" href="' . esc_url(remove_query_arg('search')) . '">' . esc_html__('Clear', 'custom-crud') . '</a>';
+    }
+    echo '</div>';
+    echo '</div>';
+
     echo '</form>';
 
     // Table display
