@@ -224,14 +224,26 @@ add_action('wp_ajax_get_table_fields', function() {
 function render_table_row($row, $columns, $primary_key) {
     $output = '<tr>';
     foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
-        $output .= '<td>' . (isset($row->$field) ? nl2br(htmlspecialchars_decode(esc_html($row->$field))) : '') . '</td>';
+        $value = isset($row->$field) ? $row->$field : '';
+        $type = isset($columns[$field]['type']) ? $columns[$field]['type'] : 'text';
 
+        // If the field is type url, make it a clickable link
+        if ($type === 'url' && !empty($value)) {
+            $value = '<a href="' . esc_url($value) . '" target="_blank" rel="noopener noreferrer">' . esc_html($value) . '</a>';
+        } else {
+            $value = nl2br(htmlspecialchars_decode(esc_html($value)));
+        }
+
+        $output .= '<td>' . $value . '</td>';
     }
+
+    // Actions
     $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">Edit</a> | ';
     $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
     $output .= '</tr>';
     return $output;
 }
+
 
 function render_pagination_controls($page, $total, $per_page) {
     $total_pages = ceil($total / $per_page);
@@ -369,7 +381,12 @@ function generic_table_manager_shortcode($config) {
             echo '<textarea name="' . esc_attr($field) . '" rows="3" required>' . esc_textarea($value) . '</textarea>';
         } else {
             $step = $type === 'number' ? ' step="any"' : '';
-            echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . '>';
+            $pattern = '';
+            if ($type === 'url') {
+                $pattern = ' pattern="https?://.+"';
+            }
+            echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . $pattern . '>';
+
         }
         if ($error) {
             echo '<br><small class="error-message">' . esc_html__('This field is required.', 'custom-crud') . '</small>';
