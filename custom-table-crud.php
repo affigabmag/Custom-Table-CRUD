@@ -230,7 +230,15 @@ add_action('wp_ajax_get_table_fields', function() {
 
 function render_table_row($row, $columns, $primary_key) {
     $output = '<tr>';
-    foreach (array_merge([$primary_key], array_keys($columns)) as $field) {
+    
+    // Only include the primary key if it's also in the columns array
+    $display_fields = array_keys($columns);
+    if (!in_array($primary_key, $display_fields)) {
+        // Don't add the primary key to displayed fields
+    }
+    
+    // Loop through only the selected fields
+    foreach ($display_fields as $field) {
         $value = isset($row->$field) ? $row->$field : '';
         $type = isset($columns[$field]['type']) ? $columns[$field]['type'] : 'text';
 
@@ -244,7 +252,7 @@ function render_table_row($row, $columns, $primary_key) {
         $output .= '<td>' . $value . '</td>';
     }
 
-    // Actions
+    // Actions - we still need the primary key for edit/delete operations
     $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">Edit</a> | ';
     $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
     $output .= '</tr>';
@@ -431,7 +439,8 @@ function generic_table_manager_shortcode($config) {
 
     // Table display
     echo '<table class="wp-books-table"><tr>';
-    foreach (array_merge([$primary_key => 'ID'], $columns) as $col => $meta) {
+    // Only display the column headers for fields you've explicitly selected
+    foreach ($columns as $col => $meta) {
         $label = is_array($meta) ? $meta['label'] : $meta;
         $new_order = ($order_by === $col && $order_dir === 'ASC') ? 'desc' : 'asc';
         echo '<th><a href="' . esc_url(add_query_arg(['orderby' => $col, 'order' => $new_order])) . '">' . esc_html($label) . '</a></th>';
