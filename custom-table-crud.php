@@ -51,6 +51,10 @@ function handle_wp_table_manager_shortcode($atts = []) {
         'pagination' => 5,
         'table_view' => '',
         'showrecordscount' => 'true',
+        'showform' => 'true',        // Add default for showing form
+        'showtable' => 'true',       // Add default for showing table
+        'showsearch' => 'true',      // Add default for showing search
+        'showpagination' => 'true',  // Add default for showing pagination
     ];
     
 
@@ -105,7 +109,11 @@ function handle_wp_table_manager_shortcode($atts = []) {
         'primary_key'       => get_primary_key_for_table($atts['table_view']),
         'columns'           => $columns,
         'pagination'        => intval($atts['pagination']),
-        'showrecordscount'  => strtolower($atts['showrecordscount']) === 'false' ? 'false' : 'true',
+        'showrecordscount'  => strtolower($atts['showrecordscount']),
+        'showform'          => strtolower($atts['showform']),
+        'showtable'         => strtolower($atts['showtable']),
+        'showsearch'        => strtolower($atts['showsearch']),
+        'showpagination'    => strtolower($atts['showpagination']),
     ]);
     
 }
@@ -315,6 +323,12 @@ function generic_table_manager_shortcode($config) {
     $primary_key = $config['primary_key'];
     $columns     = $config['columns'];
     $per_page    = isset($config['pagination']) && intval($config['pagination']) > 0 ? intval($config['pagination']) : 5;
+    $showform    = isset($config['showform']) ? $config['showform'] : 'true'; // Default to showing the form
+    $showtable   = isset($config['showtable']) ? $config['showtable'] : 'true'; // Default to showing the table
+    $showsearch  = isset($config['showsearch']) ? $config['showsearch'] : 'true'; // Default to showing search
+    $showpagination = isset($config['showpagination']) ? $config['showpagination'] : 'true'; // Default to showing pagination
+    $showrecordscount = isset($config['showrecordscount']) ? $config['showrecordscount'] : 'true'; // Default to showing records count
+    
     $editing     = false;
     $edit_data   = null;
 
@@ -403,96 +417,106 @@ function generic_table_manager_shortcode($config) {
 
     ob_start();
 
-    echo '<form method="post">';
-    echo '<input type="hidden" name="form_type" value="data_form">';
-    echo wp_nonce_field('crud_form_nonce', 'crud_nonce', true, false);
-
     if (isset($_GET['added'])) echo '<p class="success-message">✅ ' . esc_html__('Record added successfully!', 'custom-crud') . '</p>';
     if (isset($_GET['updated'])) echo '<p class="success-message">✅ ' . esc_html__('Record updated successfully!', 'custom-crud') . '</p>';
     if (isset($error_message)) echo $error_message;
 
-    if ($editing && $edit_data) echo '<input type="hidden" name="record_id" value="' . esc_attr($edit_data->$primary_key) . '">';
+    // Only display the form if showform is true
+    if ($showform !== 'false') {
+        echo '<form method="post">';
+        echo '<input type="hidden" name="form_type" value="data_form">';
+        echo wp_nonce_field('crud_form_nonce', 'crud_nonce', true, false);
 
-    foreach ($columns as $field => $meta) {
-        $label = isset($meta['label']) ? $meta['label'] : $field;
-        $type = isset($meta['type']) ? $meta['type'] : 'text';
-        $readonly = isset($meta['readonly']) && $meta['readonly'] === 'true';
-        $value = $_POST[$field] ?? ($editing && isset($edit_data->$field) ? $edit_data->$field : '');
-        $error = isset($_POST['form_type'], $_POST[$field]) && trim($_POST[$field]) === '';
-    
-        echo '<p>';
-        echo '<label for="' . esc_attr($field) . '">' . esc_html($label) . ':</label>';
-            
-        if ($readonly) {
-            echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" readonly disabled>';
-            echo '<input type="hidden" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '">';
+        if ($editing && $edit_data) echo '<input type="hidden" name="record_id" value="' . esc_attr($edit_data->$primary_key) . '">';
+
+        foreach ($columns as $field => $meta) {
+            $label = isset($meta['label']) ? $meta['label'] : $field;
+            $type = isset($meta['type']) ? $meta['type'] : 'text';
+            $readonly = isset($meta['readonly']) && $meta['readonly'] === 'true';
+            $value = $_POST[$field] ?? ($editing && isset($edit_data->$field) ? $edit_data->$field : '');
+            $error = isset($_POST['form_type'], $_POST[$field]) && trim($_POST[$field]) === '';
         
-        } elseif ($type === 'textarea') {
-            echo '<textarea name="' . esc_attr($field) . '" rows="3" required>' . esc_textarea($value) . '</textarea>';
+            echo '<p>';
+            echo '<label for="' . esc_attr($field) . '">' . esc_html($label) . ':</label>';
+                
+            if ($readonly) {
+                echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" readonly disabled>';
+                echo '<input type="hidden" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '">';
+            
+            } elseif ($type === 'textarea') {
+                echo '<textarea name="' . esc_attr($field) . '" rows="3" required>' . esc_textarea($value) . '</textarea>';
+            } else {
+                $step = ($type === 'number') ? ' step="any"' : '';
+                $pattern = ($type === 'url') ? ' pattern="https?://.+"' : '';
+                echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . $pattern . '>';
+            }
+        
+            if ($error) {
+                echo '<br><small class="error-message">This field is required.</small>';
+            }
+        
+            echo '</p>';
+        }
+        
+
+        echo '<div class="wp-books-toolbar"><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-crud') : __('Add', 'custom-crud')) . '" class="crud-submit-btn"></div>';
+
+        if ($editing) echo ' <a href="' . esc_url(remove_query_arg(['edit_record', '_wpnonce'])) . '">' . esc_html__('Cancel', 'custom-crud') . '</a>';
+        echo '</p></form>';
+    }
+
+    // Only display search if showsearch is true
+    if ($showsearch !== 'false') {
+        // Search form
+        echo '<form method="get" style="margin-top:10px;">';
+        foreach ($_GET as $key => $value) {
+            if ($key !== 'search' && $key !== 'paged') {
+                echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '">';
+            }
+        }
+        
+        if ($showrecordscount !== 'false') {
+            $total_text = sprintf(esc_html__('Records: %d', 'custom-crud'), $total);
+            echo '<div class="records-count">' . esc_html($total_text) . '</div>';
+        }
+        echo '<div class="wp-books-toolbar">';
+        echo '<div class="search-form">';
+        echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-crud') . '" />';
+        echo '<input type="submit" value="' . esc_attr__('Search', 'custom-crud') . '" />';
+        if ($search_term) {
+            echo '<a class="clear-link" href="' . esc_url(remove_query_arg('search')) . '">' . esc_html__('Clear', 'custom-crud') . '</a>';
+        }
+        echo '</div>';
+        echo '</div>';
+
+        echo '</form>';
+    }
+
+    // Only display the table if showtable is true
+    if ($showtable !== 'false') {
+        // Table display
+        echo '<table class="wp-books-table"><tr>';
+        // Only display the column headers for fields you've explicitly selected
+        foreach ($columns as $col => $meta) {
+            $label = is_array($meta) ? $meta['label'] : $meta;
+            $new_order = ($order_by === $col && $order_dir === 'ASC') ? 'desc' : 'asc';
+            echo '<th><a href="' . esc_url(add_query_arg(['orderby' => $col, 'order' => $new_order])) . '">' . esc_html($label) . '</a></th>';
+        }
+        echo '<th>' . esc_html__('Actions', 'custom-crud') . '</th></tr>';
+
+        if (!empty($rows)) {
+            foreach ($rows as $row) {
+                echo render_table_row($row, $columns, $primary_key);
+            }
         } else {
-            $step = ($type === 'number') ? ' step="any"' : '';
-            $pattern = ($type === 'url') ? ' pattern="https?://.+"' : '';
-            echo '<input type="' . esc_attr($type) . '" name="' . esc_attr($field) . '" value="' . esc_attr($value) . '" required' . $step . $pattern . '>';
+            echo '<tr><td colspan="' . (count($columns) + 2) . '">' . esc_html__('No records found.', 'custom-crud') . '</td></tr>';
         }
-    
-        if ($error) {
-            echo '<br><small class="error-message">This field is required.</small>';
-        }
-    
-        echo '</p>';
+        
+        echo '</table>';
     }
-    
 
-    echo '<div class="wp-books-toolbar"><input type="submit" name="' . ($editing ? 'update_record' : 'add_record') . '" value="' . esc_attr($editing ? __('Update', 'custom-crud') : __('Add', 'custom-crud')) . '" class="crud-submit-btn"></div>';
-
-    if ($editing) echo ' <a href="' . esc_url(remove_query_arg(['edit_record', '_wpnonce'])) . '">' . esc_html__('Cancel', 'custom-crud') . '</a>';
-    echo '</p></form>';
-
-    // Search form
-    echo '<form method="get" style="margin-top:10px;">';
-    foreach ($_GET as $key => $value) {
-        if ($key !== 'search' && $key !== 'paged') {
-            echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '">';
-        }
-    }
-    
-    if (!isset($config['showrecordscount']) || $config['showrecordscount'] === 'true') {
-        $total_text = sprintf(esc_html__('Records: %d', 'custom-crud'), $total);
-        echo '<div class="records-count">' . esc_html($total_text) . '</div>';
-    }
-    echo '<div class="wp-books-toolbar">';
-    echo '<div class="search-form">';
-    echo '<input type="text" name="search" value="' . esc_attr($search_term) . '" placeholder="' . esc_attr__('Search...', 'custom-crud') . '" />';
-    echo '<input type="submit" value="' . esc_attr__('Search', 'custom-crud') . '" />';
-    if ($search_term) {
-        echo '<a class="clear-link" href="' . esc_url(remove_query_arg('search')) . '">' . esc_html__('Clear', 'custom-crud') . '</a>';
-    }
-    echo '</div>';
-    echo '</div>';
-
-    echo '</form>';
-
-    // Table display
-    echo '<table class="wp-books-table"><tr>';
-    // Only display the column headers for fields you've explicitly selected
-    foreach ($columns as $col => $meta) {
-        $label = is_array($meta) ? $meta['label'] : $meta;
-        $new_order = ($order_by === $col && $order_dir === 'ASC') ? 'desc' : 'asc';
-        echo '<th><a href="' . esc_url(add_query_arg(['orderby' => $col, 'order' => $new_order])) . '">' . esc_html($label) . '</a></th>';
-    }
-    echo '<th>' . esc_html__('Actions', 'custom-crud') . '</th></tr>';
-
-    if (!empty($rows)) {
-        foreach ($rows as $row) {
-            echo render_table_row($row, $columns, $primary_key);
-        }
-    } else {
-        echo '<tr><td colspan="' . (count($columns) + 2) . '">' . esc_html__('No records found.', 'custom-crud') . '</td></tr>';
-    }
-    
-    echo '</table>';
-
-    if ($total > $per_page) {
+    // Only display the pagination if showpagination is true
+    if ($showpagination !== 'false' && $total > $per_page) {
         echo render_pagination_controls($page, $total, $per_page);
     }
 
