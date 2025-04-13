@@ -102,7 +102,7 @@ function handle_wp_table_manager_shortcode($atts = []) {
 
     return generic_table_manager_shortcode([
         'table_name'        => $atts['table_view'],
-        'primary_key'       => 'id',
+        'primary_key'       => get_primary_key_for_table($atts['table_view']),
         'columns'           => $columns,
         'pagination'        => intval($atts['pagination']),
         'showrecordscount'  => strtolower($atts['showrecordscount']) === 'false' ? 'false' : 'true',
@@ -238,19 +238,14 @@ add_action('wp_ajax_get_table_fields', function() {
 
 function render_table_row($row, $columns, $primary_key) {
     $output = '<tr>';
-    
-    // Only include the primary key if it's also in the columns array
+
     $display_fields = array_keys($columns);
-    if (!in_array($primary_key, $display_fields)) {
-        // Don't add the primary key to displayed fields
-    }
-    
-    // Loop through only the selected fields
+
+    // Loop through selected fields
     foreach ($display_fields as $field) {
         $value = isset($row->$field) ? $row->$field : '';
         $type = isset($columns[$field]['type']) ? $columns[$field]['type'] : 'text';
 
-        // If the field is type url, make it a clickable link
         if ($type === 'url' && !empty($value)) {
             $value = '<a href="' . esc_url($value) . '" target="_blank" rel="noopener noreferrer">' . esc_html($value) . '</a>';
         } else {
@@ -260,12 +255,27 @@ function render_table_row($row, $columns, $primary_key) {
         $output .= '<td>' . $value . '</td>';
     }
 
-    // Actions - we still need the primary key for edit/delete operations
-    $output .= '<td><a href="' . esc_url(add_query_arg(['edit_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('edit_record_' . $row->$primary_key)])) . '">Edit</a> | ';
-    $output .= '<a href="' . esc_url(add_query_arg(['delete_record' => $row->$primary_key, '_wpnonce' => wp_create_nonce('delete_record_' . $row->$primary_key)])) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
+    // Handle missing primary key safely
+    $record_id = isset($row->$primary_key) ? $row->$primary_key : null;
+
+    if ($record_id !== null) {
+        $output .= '<td><a href="' . esc_url(add_query_arg([
+            'edit_record' => $record_id,
+            '_wpnonce' => wp_create_nonce('edit_record_' . $record_id)
+        ])) . '">Edit</a> | ';
+
+        $output .= '<a href="' . esc_url(add_query_arg([
+            'delete_record' => $record_id,
+            '_wpnonce' => wp_create_nonce('delete_record_' . $record_id)
+        ])) . '" onclick="return confirm(\'Are you sure?\');">Delete</a></td>';
+    } else {
+        $output .= '<td><em>No Primary Key</em></td>';
+    }
+
     $output .= '</tr>';
     return $output;
 }
+
 
 
 function render_pagination_controls($page, $total, $per_page) {
@@ -474,4 +484,16 @@ function generic_table_manager_shortcode($config) {
     }
 
     return ob_get_clean();
+}
+
+function get_primary_key_for_table($table_name) {
+    global $wpdb;
+    $primary_key = 'id';
+
+    $results = $wpdb->get_results("SHOW KEYS FROM `$table_name` WHERE Key_name = 'PRIMARY'");
+    if (!empty($results)) {
+        $primary_key = $results[0]->Column_name;
+    }
+
+    return $primary_key;
 }
