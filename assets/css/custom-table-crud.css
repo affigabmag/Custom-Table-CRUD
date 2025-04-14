@@ -1,0 +1,300 @@
+/**
+ * Custom Table CRUD Frontend CSS
+ */
+
+/* Table styles */
+.wp-books-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wp-books-table th, 
+.wp-books-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.wp-books-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    position: relative;
+}
+
+.wp-books-table th a {
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.wp-books-table th a:hover {
+    color: #0073aa;
+}
+
+.wp-books-table th .sort-indicator {
+    width: 0;
+    height: 0;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.wp-books-table th .sort-indicator.asc {
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #333;
+}
+
+.wp-books-table th .sort-indicator.desc {
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #333;
+}
+
+.wp-books-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.wp-books-table tr:hover {
+    background-color: #f0f0f0;
+}
+
+/* Actions column */
+.wp-books-table .actions-column {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.wp-books-table .action-edit,
+.wp-books-table .action-delete {
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 0 2px;
+    border-radius: 3px;
+    text-decoration: none;
+}
+
+.wp-books-table .action-edit {
+    background-color: #0073aa;
+    color: white;
+}
+
+.wp-books-table .action-delete {
+    background-color: #dc3232;
+    color: white;
+}
+
+.wp-books-table .action-edit:hover {
+    background-color: #005d87;
+}
+
+.wp-books-table .action-delete:hover {
+    background-color: #ba2020;
+}
+
+/* Form styles */
+.custom-table-crud-form {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.custom-table-crud-form p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.custom-table-crud-form label {
+    min-width: 120px;
+    font-weight: bold;
+}
+
+.custom-table-crud-form input[type="text"],
+.custom-table-crud-form input[type="number"],
+.custom-table-crud-form input[type="email"],
+.custom-table-crud-form input[type="url"],
+.custom-table-crud-form input[type="tel"],
+.custom-table-crud-form input[type="password"],
+.custom-table-crud-form input[type="date"],
+.custom-table-crud-form input[type="datetime"],
+.custom-table-crud-form textarea,
+.custom-table-crud-form select {
+    flex: 1;
+    min-width: 250px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.custom-table-crud-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.custom-table-crud-form input[type="text"]:focus,
+.custom-table-crud-form input[type="number"]:focus,
+.custom-table-crud-form input[type="email"]:focus,
+.custom-table-crud-form input[type="url"]:focus,
+.custom-table-crud-form input[type="tel"]:focus,
+.custom-table-crud-form input[type="password"]:focus,
+.custom-table-crud-form input[type="date"]:focus,
+.custom-table-crud-form input[type="datetime"]:focus,
+.custom-table-crud-form textarea:focus,
+.custom-table-crud-form select:focus {
+    border-color: #0073aa;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 115, 170, 0.3);
+}
+
+.custom-table-crud-form input.error,
+.custom-table-crud-form textarea.error {
+    border-color: #dc3232;
+    background-color: #fff8f8;
+}
+
+/* Search form styles */
+.custom-table-crud-search {
+    margin: 20px 0;
+}
+
+.wp-books-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.wp-books-toolbar .records-count {
+    font-weight: bold;
+}
+
+.wp-books-toolbar .search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wp-books-toolbar .search-form input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 200px;
+}
+
+.wp-books-toolbar input[type="submit"],
+.wp-books-toolbar .clear-link,
+.crud-submit-btn,
+.button-cancel {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.wp-books-toolbar input[type="submit"],
+.crud-submit-btn {
+    background-color: #0073aa;
+    color: white;
+}
+
+.wp-books-toolbar .clear-link {
+    background-color: #f7f7f7;
+    color: #555;
+    border: 1px solid #ccc;
+}
+
+.button-cancel {
+    background-color: #f7f7f7;
+    color: #555;
+    border: 1px solid #ccc;
+}
+
+.wp-books-toolbar input[type="submit"]:hover,
+.crud-submit-btn:hover {
+    background-color: #005d87;
+}
+
+.wp-books-toolbar .clear-link:hover,
+.button-cancel:hover {
+    background-color: #eaeaea;
+}
+
+/* Pagination styles */
+.custom-table-crud-pagination {
+    margin: 20px 0;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.page-prev,
+.page-next {
+    padding: 8px 16px;
+    background-color: #0073aa;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.page-prev:hover,
+.page-next:hover {
+    background-color: #005d87;
+}
+
+.pagination-info {
+    font-weight: bold;
+}
+
+.pagination-jump {
+    margin-top: 10px;
+}
+
+.pagination-jump select {
+    margin-left: 10px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Message styles */
+.success-message,
+.error-message {
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.success-message {
+    background-color: #ecf9ec;
+    border-left: 4px solid #46b450;
+    color: #1e7731;
+}
+
+.error-message {
+    background-color: #fde8e8;
+    border-left: 4px solid #dc3232;
+    color: #a72020;
+}
