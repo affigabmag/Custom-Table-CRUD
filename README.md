@@ -99,6 +99,12 @@ custom-table-crud/
 
 This plugin is released under the GPLv2 or later license.
 
+## Screenshots
+![Image](https://github.com/user-attachments/assets/72f8f0fd-8ae9-4442-9957-c272e45b6e0b)
+![Image](https://github.com/user-attachments/assets/fa95e6b1-da19-4dcc-9c9f-ada32a861a60)
+![Image](https://github.com/user-attachments/assets/5b334c5f-40b1-4a49-826b-956a99e372f4)
+![Image](https://github.com/user-attachments/assets/9ba3cb20-f604-455f-b516-7767bbfc8088)
+
 ## Changelog
 
 ### 2.0.0
