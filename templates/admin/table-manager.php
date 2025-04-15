@@ -10,9 +10,39 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Start output buffering to prevent "headers already sent" warnings
+ob_start();
+
 // Process form submissions
 $message = '';
 $message_type = '';
+
+// Check if we need to confirm table deletion
+$delete_table = isset($_GET['delete_table']) ? sanitize_text_field($_GET['delete_table']) : '';
+$delete_confirmed = isset($_GET['confirm_delete']) && $_GET['confirm_delete'] === 'yes';
+$delete_nonce_valid = isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'delete_table_' . $delete_table);
+
+if ($delete_table && $delete_confirmed && $delete_nonce_valid) {
+    $result = $table_manager->delete_table($delete_table);
+    
+    if (is_wp_error($result)) {
+        $message = $result->get_error_message();
+        $message_type = 'error';
+    } else {
+        $message = __('Table deleted successfully!', 'custom-table-crud');
+        $message_type = 'success';
+    }
+    
+    // Clean output buffer before redirect
+    ob_clean();
+    
+    // Redirect to remove query args
+    // JavaScript redirect instead of wp_redirect
+    echo '<script type="text/javascript">
+        window.location.href = "' . esc_url(remove_query_arg(array('delete_table', 'confirm_delete', '_wpnonce'))) . '";
+    </script>';
+    exit;
+}
 
 if (isset($_POST['create_table']) && wp_verify_nonce($_POST['_wpnonce'], 'custom_crud_create_table')) {
     // Process table creation
@@ -51,27 +81,6 @@ if (isset($_POST['create_table']) && wp_verify_nonce($_POST['_wpnonce'], 'custom
         $message = __('Table created successfully!', 'custom-table-crud');
         $message_type = 'success';
     }
-}
-
-// Check if we need to confirm table deletion
-$delete_table = isset($_GET['delete_table']) ? sanitize_text_field($_GET['delete_table']) : '';
-$delete_confirmed = isset($_GET['confirm_delete']) && $_GET['confirm_delete'] === 'yes';
-$delete_nonce_valid = isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'delete_table_' . $delete_table);
-
-if ($delete_table && $delete_confirmed && $delete_nonce_valid) {
-    $result = $table_manager->delete_table($delete_table);
-    
-    if (is_wp_error($result)) {
-        $message = $result->get_error_message();
-        $message_type = 'error';
-    } else {
-        $message = __('Table deleted successfully!', 'custom-table-crud');
-        $message_type = 'success';
-    }
-    
-    // Redirect to remove query args
-    wp_redirect(remove_query_arg(array('delete_table', 'confirm_delete', '_wpnonce')));
-    exit;
 }
 ?>
 
