@@ -8,30 +8,32 @@ A WordPress plugin for CRUD operations on custom database tables with working pa
 custom-table-crud/
 ├── assets/
 │   ├── css/
-│   │   ├── custom-table-crud.css            (Frontend styles)
-│   │   └── custom-table-crud-admin.css      (Admin styles)
+│   │   ├── custom-table-crud-admin.css      (Admin styles)
+│   │   └── custom-table-crud.css            (Frontend styles)
 │   └── js/
-│       ├── custom-table-crud.js             (Frontend scripts)
-│       └── custom-table-crud-admin.js       (Admin scripts)
+│       ├── custom-table-crud-admin.js       (Admin scripts)
+│       └── custom-table-crud.js             (Frontend scripts)
 ├── includes/
-│   ├── class-plugin-core.php                (Main plugin class)
 │   ├── class-admin.php                      (Admin functionality)
+│   ├── class-ajax-handler.php               (AJAX processing)
+│   ├── class-plugin-core.php                (Main plugin class)
 │   ├── class-shortcode.php                  (Shortcode handling)
-│   ├── class-table-manager.php              (Table rendering & CRUD)
-│   └── class-ajax-handler.php               (AJAX processing)
+│   └── class-table-manager.php              (Table rendering & CRUD)
 ├── templates/
 │   ├── admin/
 │   │   ├── dashboard.php                    (Admin dashboard)
-│   │   └── shortcode-generator.php          (Shortcode builder UI)
+│   │   ├── shortcode-generator.php          (Shortcode builder UI)
+│   │   └── table-manager.php                (Admin table management UI)
 │   └── frontend/
 │       ├── form-view.php                    (Record form template)
-│       ├── table-view.php                   (Data table template)
+│       ├── pagination-view.php              (Pagination controls)
 │       ├── search-view.php                  (Search form template)
-│       └── pagination-view.php              (Pagination controls)
+│       └── table-view.php                   (Data table template)
+├── .gitignore                               (Git exclusion file)
 ├── custom-table-crud.php                    (Main plugin file)
-├── uninstall.php                            (Clean removal functionality)
-├── README.md
-└── readme.txt
+├── README.md                                (Plugin documentation - markdown)
+├── readme.txt                               (Plugin documentation - text)
+└── uninstall.php                            (Clean removal functionality)
 ```
 
 ## Features

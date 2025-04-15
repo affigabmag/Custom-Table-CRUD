@@ -30,19 +30,33 @@ Features include:
 ```
 custom-table-crud/
 ├── assets/
-│   ├── css/               - Style files
-│   └── js/                - JavaScript files
-├── includes/              - PHP class files
-│   ├── class-plugin-core.php
-│   ├── class-admin.php
-│   ├── class-shortcode.php
-│   ├── class-table-manager.php
-│   └── class-ajax-handler.php
-├── templates/             - Template files
-│   ├── admin/             - Admin UI templates
-│   └── frontend/          - Frontend display templates
-├── custom-table-crud.php  - Main plugin file
-└── uninstall.php          - Clean uninstall script
+│   ├── css/
+│   │   ├── custom-table-crud-admin.css      (Admin styles)
+│   │   └── custom-table-crud.css            (Frontend styles)
+│   └── js/
+│       ├── custom-table-crud-admin.js       (Admin scripts)
+│       └── custom-table-crud.js             (Frontend scripts)
+├── includes/
+│   ├── class-admin.php                      (Admin functionality)
+│   ├── class-ajax-handler.php               (AJAX processing)
+│   ├── class-plugin-core.php                (Main plugin class)
+│   ├── class-shortcode.php                  (Shortcode handling)
+│   └── class-table-manager.php              (Table rendering & CRUD)
+├── templates/
+│   ├── admin/
+│   │   ├── dashboard.php                    (Admin dashboard)
+│   │   ├── shortcode-generator.php          (Shortcode builder UI)
+│   │   └── table-manager.php                (Admin table management UI)
+│   └── frontend/
+│       ├── form-view.php                    (Record form template)
+│       ├── pagination-view.php              (Pagination controls)
+│       ├── search-view.php                  (Search form template)
+│       └── table-view.php                   (Data table template)
+├── .gitignore                               (Git exclusion file)
+├── custom-table-crud.php                    (Main plugin file)
+├── README.md                                (Plugin documentation - markdown)
+├── readme.txt                               (Plugin documentation - text)
+└── uninstall.php                            (Clean removal functionality)
 ```
 
 = How It Works =

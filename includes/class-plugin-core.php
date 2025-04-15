@@ -33,6 +33,13 @@ class Plugin_Core {
     private $ajax_handler;
     
     /**
+     * Table manager instance
+     * 
+     * @var Table_Manager
+     */
+    private $table_manager;
+    
+    /**
      * Initialize the plugin components
      *
      * @return void
@@ -45,10 +52,14 @@ class Plugin_Core {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         
+        // Remove WordPress footer text on plugin pages
+        add_filter('admin_footer_text', array($this, 'remove_admin_footer_text'), 99);
+        
         // Initialize components
         $this->admin = new Admin();
         $this->shortcode = new Shortcode();
         $this->ajax_handler = new Ajax_Handler();
+        $this->table_manager = new Table_Manager();
     }
     
     /**
@@ -134,8 +145,25 @@ class Plugin_Core {
                 'noTableSelected' => __('Please select a table', 'custom-table-crud'),
                 'loadingFields' => __('Loading fields...', 'custom-table-crud'),
                 'errorLoadingFields' => __('Error loading fields', 'custom-table-crud'),
+                'confirmDeleteTable' => __('Are you sure you want to delete this table? This action cannot be undone!', 'custom-table-crud'),
+                'addAnotherField' => __('Add Another Field', 'custom-table-crud'),
+                'removeField' => __('Remove Field', 'custom-table-crud'),
             )
         ));
+    }
+    
+    /**
+     * Remove WordPress admin footer text
+     *
+     * @param string $text Footer text
+     * @return string Empty string on plugin pages, original text elsewhere
+     */
+    public function remove_admin_footer_text($text) {
+        $screen = get_current_screen();
+        if (strpos($screen->id, 'custom_crud') !== false) {
+            return '';
+        }
+        return $text;
     }
     
     /**

@@ -134,6 +134,135 @@
     };
     
     /**
+     * Initialize table manager functionality
+     */
+    function initTableManager() {
+        // Handle field type change to show/hide appropriate length input
+        $(document).on('change', 'select[name^="field_type"]', function() {
+            const value = $(this).val();
+            const lengthInput = $(this).closest('.field-row').find('input[name^="field_length"]');
+            
+            if (value === 'text') {
+                lengthInput.val('').prop('disabled', true);
+            } else {
+                lengthInput.prop('disabled', false);
+                
+                // Set default length based on field type
+                if (value === 'int') {
+                    lengthInput.val('11');
+                } else if (value === 'varchar') {
+                    lengthInput.val('255');
+                } else if (value === 'decimal') {
+                    lengthInput.val('10,2');
+                }
+            }
+        });
+        
+        // Add field button handler
+        $('.add-field').on('click', function() {
+            const template = $('.field-template').clone();
+            template.removeClass('field-template').show();
+            
+            // Ensure primary key is unchecked for new fields
+            template.find('input[name="field_primary[]"]').prop('checked', false);
+            
+            // Add to container
+            $('#fields-container').append(template);
+            
+            // Update remove button status
+            updateRemoveButtonStatus();
+        });
+        
+        // Remove field button handler (using event delegation)
+        $(document).on('click', '.remove-field', function() {
+            $(this).closest('.field-row').remove();
+            updateRemoveButtonStatus();
+        });
+        
+        // Handle primary key selection (only one allowed)
+        $(document).on('change', 'input[name="field_primary[]"]', function() {
+            if ($(this).is(':checked')) {
+                // Uncheck all other primary key checkboxes
+                $('input[name="field_primary[]"]').not(this).prop('checked', false);
+            }
+        });
+        
+        // Handle AUTO_INCREMENT selection (only for primary key)
+        $(document).on('change', 'select[name="field_extra[]"]', function() {
+            const value = $(this).val();
+            if (value === 'auto_increment') {
+                const row = $(this).closest('.field-row');
+                // Check the primary key checkbox
+                row.find('input[name="field_primary[]"]').prop('checked', true).trigger('change');
+                // Set type to int
+                row.find('select[name="field_type[]"]').val('int').trigger('change');
+            }
+        });
+        
+        // Update remove button status on page load
+        updateRemoveButtonStatus();
+        
+        // Confirm table deletion
+        $(document).on('click', '.cancel-delete', function () {
+            $(this).closest('.delete-confirmation').remove();
+        });
+        
+        // Initialize edit field form
+        $('#modify_field_name').on('change', function() {
+            const fieldName = $(this).val();
+            const structure = getTableStructure();
+            
+            // Find the selected field
+            const field = structure.find(f => f.name === fieldName);
+            if (field) {
+                $('#modify_field_type').val(field.type || 'varchar');
+                $('#modify_field_length').val(field.length || '');
+                $('input[name="field_null"]').prop('checked', field.null);
+                $('#modify_field_default').val(field.default || '');
+            }
+        });
+
+        
+
+        // Trigger change to populate initial values
+        $('#modify_field_name').trigger('change');
+    }
+    
+    /**
+     * Update remove button status (disable if only one field remains)
+     */
+    function updateRemoveButtonStatus() {
+        const visibleFields = $('.field-row:visible').length;
+        $('.remove-field').prop('disabled', visibleFields <= 1);
+    }
+    
+    /**
+     * Get table structure from the current page
+     * @returns {Array} Array of field objects
+     */
+    function getTableStructure() {
+        const structure = [];
+        
+        $('.current-structure table tbody tr').each(function() {
+            const cells = $(this).find('td');
+            
+            if (cells.length >= 7) {
+                structure.push({
+                    name: $(cells[0]).text(),
+                    type: $(cells[1]).text(),
+                    length: $(cells[2]).text(),
+                    null: $(cells[3]).text() === '✓',
+                    default: $(cells[4]).text(),
+                    extra: $(cells[5]).text(),
+                    key: $(cells[6]).text()
+                });
+            }
+        });
+        
+        return structure;
+    }
+    
+    /**
      * Initialize on document ready
      */
     $(document).ready(function() {
@@ -150,6 +279,20 @@
                 window.location.href = tableLink;
             }
         });
+        
+        // Initialize table manager functionality
+        initTableManager();
+
+        // Refresh tables button
+        $('#refresh-tables').on('click', function () {
+            location.reload();
+        });
+
+        $(document).on('click', '.cancel-delete', function () {
+            $(this).closest('.delete-confirmation').remove();
+        });
+        
+
     });
     
 })(jQuery);

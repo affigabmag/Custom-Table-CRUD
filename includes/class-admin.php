@@ -50,6 +50,16 @@ class Admin {
             'custom_crud_shortcode',
             array($this, 'render_shortcode_page')
         );
+        
+        // Add new submenu page for table creation and management
+        add_submenu_page(
+            'custom_crud_dashboard',
+            __('Table Manager', 'custom-table-crud'),
+            __('Table Manager', 'custom-table-crud'),
+            'manage_options',
+            'custom_crud_table_manager',
+            array($this, 'render_table_manager_page')
+        );
     }
     
     /**
@@ -79,6 +89,29 @@ class Admin {
         
         // Include template
         include CUSTOM_TABLE_CRUD_PATH . 'templates/admin/shortcode-generator.php';
+    }
+    
+    /**
+     * Render the table manager page
+     *
+     * @return void
+     */
+    public function render_table_manager_page() {
+        // Get database tables
+        global $wpdb;
+        $tables = $wpdb->get_col("SHOW TABLES");
+        
+        // Get active tab
+        $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'list';
+        
+        // Get table manager instance
+        $table_manager = new Table_Manager();
+        
+        // Get selected table for editing
+        $selected_table = isset($_GET['table']) ? sanitize_text_field($_GET['table']) : '';
+        
+        // Include template
+        include CUSTOM_TABLE_CRUD_PATH . 'templates/admin/table-manager.php';
     }
     
     /**

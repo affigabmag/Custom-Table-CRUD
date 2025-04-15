@@ -6,11 +6,262 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Handles the display and CRUD operations for database tables
- * 
+ * Handles the creation and management of database tables
+ *
  * @since 2.0.0
  */
 class Table_Manager {
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        // Register AJAX handlers if needed
+    }
+    
+    /**
+     * Create a new database table
+     *
+     * @param string $table_name Table name
+     * @param array $fields Field definitions
+     * @return true|WP_Error True on success, WP_Error on failure
+     */
+    public function create_table($table_name, $fields) {
+        if (empty($table_name) || empty($fields)) {
+            return new \WP_Error('invalid_params', __('Invalid parameters for table creation', 'custom-table-crud'));
+        }
+        
+        global $wpdb;
+        
+        // Check if table already exists
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_name
+        ));
+        
+        if ($table_exists) {
+            return new \WP_Error('table_exists', __('Table already exists', 'custom-table-crud'));
+        }
+        
+        // Build SQL for table creation
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE $table_name (";
+        
+        $has_primary_key = false;
+        
+        foreach ($fields as $field) {
+            // Sanitize field properties
+            $field_name = sanitize_key($field['name']);
+            $field_type = strtolower(sanitize_text_field($field['type']));
+            $field_length = isset($field['length']) ? sanitize_text_field($field['length']) : '';
+            $field_null = isset($field['null']) && $field['null'] ? 'NULL' : 'NOT NULL';
+            $field_default = isset($field['default']) ? sanitize_text_field($field['default']) : '';
+            $field_extra = isset($field['extra']) ? sanitize_text_field($field['extra']) : '';
+            $field_primary = isset($field['primary']) && $field['primary'] ? true : false;
+            
+            // Build field SQL
+            $sql .= "$field_name ";
+            
+            // Determine SQL type based on field type
+            switch ($field_type) {
+                case 'int':
+                    $length = !empty($field_length) ? $field_length : '11';
+                    $sql .= "INT($length)";
+                    break;
+                
+                case 'varchar':
+                    $length = !empty($field_length) ? $field_length : '255';
+                    $sql .= "VARCHAR($length)";
+                    break;
+                
+                case 'text':
+                    $sql .= "TEXT";
+                    break;
+                
+                case 'date':
+                    $sql .= "DATE";
+                    break;
+                
+                case 'datetime':
+                    $sql .= "DATETIME";
+                    break;
+                
+                case 'decimal':
+                    $length = !empty($field_length) ? $field_length : '10,2';
+                    $sql .= "DECIMAL($length)";
+                    break;
+                
+                default:
+                    $length = !empty($field_length) ? $field_length : '255';
+                    $sql .= "VARCHAR($length)";
+                    break;
+            }
+            
+            // Add NULL/NOT NULL
+            $sql .= " $field_null";
+            
+            // Add DEFAULT if specified
+            if ($field_default !== '') {
+                if ($field_type === 'int' || $field_type === 'decimal') {
+                    $sql .= " DEFAULT $field_default";
+                } else {
+                    $sql .= " DEFAULT '$field_default'";
+                }
+            }
+            
+            // Add AUTO_INCREMENT if specified
+            if ($field_extra === 'auto_increment') {
+                $sql .= " AUTO_INCREMENT";
+            }
+            
+            // Add PRIMARY KEY if this is the primary key
+            if ($field_primary) {
+                $has_primary_key = true;
+            }
+            
+            $sql .= ", ";
+        }
+        
+        // Add primary key if defined
+        foreach ($fields as $field) {
+            if (isset($field['primary']) && $field['primary']) {
+                $sql .= "PRIMARY KEY  (" . sanitize_key($field['name']) . ")";
+                break;
+            }
+        }
+        
+        // Remove trailing comma if no primary key was added
+        if (!$has_primary_key) {
+            $sql = rtrim($sql, ', ');
+        }
+        
+        $sql .= ") $charset_collate;";
+        
+        // Create the table
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $result = dbDelta($sql);
+        
+        // Check if table was created successfully
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_name
+        ));
+        
+        if (!$table_exists) {
+            return new \WP_Error('creation_failed', __('Table creation failed', 'custom-table-crud'));
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Delete a database table
+     *
+     * @param string $table_name Table name
+     * @return true|WP_Error True on success, WP_Error on failure
+     */
+    public function delete_table($table_name) {
+        if (empty($table_name)) {
+            return new \WP_Error('invalid_params', __('Invalid table name', 'custom-table-crud'));
+        }
+        
+        global $wpdb;
+        
+        // Check if table exists
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_name
+        ));
+        
+        if (!$table_exists) {
+            return new \WP_Error('table_not_exists', __('Table does not exist', 'custom-table-crud'));
+        }
+        
+        // Delete the table
+        $sql = "DROP TABLE $table_name";
+        $result = $wpdb->query($sql);
+        
+        if ($result === false) {
+            return new \WP_Error('deletion_failed', __('Table deletion failed', 'custom-table-crud'));
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Modify an existing database table
+     *
+     * @param string $table_name Table name
+     * @param array $fields New/modified field definitions
+     * @param array $operations Operations to perform (add, modify, drop)
+     * @return true|WP_Error True on success, WP_Error on failure
+     */
+    public function modify_table($table_name, $fields, $operations) {
+        if (empty($table_name)) {
+            return new \WP_Error('invalid_params', __('Invalid table name', 'custom-table-crud'));
+        }
+        
+        global $wpdb;
+        
+        // Check if table exists
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_name
+        ));
+        
+        if (!$table_exists) {
+            return new \WP_Error('table_not_exists', __('Table does not exist', 'custom-table-crud'));
+        }
+        
+        // Process operations
+        $sql_statements = array();
+        
+        // First, handle column operations
+        if (!empty($operations)) {
+            foreach ($operations as $operation) {
+                switch ($operation['type']) {
+                    case 'add':
+                        // Add column
+                        $field = $this->get_field_by_name($fields, $operation['field']);
+                        if ($field) {
+                            $sql_statements[] = $this->generate_add_column_sql($table_name, $field);
+                        }
+                        break;
+                    
+                    case 'modify':
+                        // Modify column
+                        $field = $this->get_field_by_name($fields, $operation['field']);
+                        if ($field) {
+                            $sql_statements[] = $this->generate_modify_column_sql($table_name, $field);
+                        }
+                        break;
+                    
+                    case 'drop':
+                        // Drop column
+                        $sql_statements[] = $this->generate_drop_column_sql($table_name, $operation['field']);
+                        break;
+                }
+            }
+        }
+        
+        // Execute all SQL statements
+        $success = true;
+        $errors = array();
+        
+        foreach ($sql_statements as $sql) {
+            $result = $wpdb->query($sql);
+            if ($result === false) {
+                $success = false;
+                $errors[] = $wpdb->last_error;
+            }
+        }
+        
+        if (!$success) {
+            return new \WP_Error('modification_failed', __('Table modification failed: ', 'custom-table-crud') . implode(', ', $errors));
+        }
+        
+        return true;
+    }
+    
     /**
      * Process form submissions and render the table
      *
@@ -310,5 +561,286 @@ class Table_Manager {
         
         $output .= '</tr>';
         return $output;
+    }
+    
+    /**
+     * Get field definition by name from array of fields
+     *
+     * @param array $fields Array of field definitions
+     * @param string $name Field name
+     * @return array|null Field definition or null if not found
+     */
+    private function get_field_by_name($fields, $name) {
+        foreach ($fields as $field) {
+            if ($field['name'] === $name) {
+                return $field;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Generate SQL for adding a column
+     *
+     * @param string $table_name Table name
+     * @param array $field Field definition
+     * @return string SQL statement
+     */
+    private function generate_add_column_sql($table_name, $field) {
+        // Sanitize field properties
+        $field_name = sanitize_key($field['name']);
+        $field_type = strtolower(sanitize_text_field($field['type']));
+        $field_length = isset($field['length']) ? sanitize_text_field($field['length']) : '';
+        $field_null = isset($field['null']) && $field['null'] ? 'NULL' : 'NOT NULL';
+        $field_default = isset($field['default']) ? sanitize_text_field($field['default']) : '';
+        $field_extra = isset($field['extra']) ? sanitize_text_field($field['extra']) : '';
+        
+        $sql = "ALTER TABLE $table_name ADD COLUMN $field_name ";
+        
+        // Determine SQL type based on field type
+        switch ($field_type) {
+            case 'int':
+                $length = !empty($field_length) ? $field_length : '11';
+                $sql .= "INT($length)";
+                break;
+            
+            case 'varchar':
+                $length = !empty($field_length) ? $field_length : '255';
+                $sql .= "VARCHAR($length)";
+                break;
+            
+            case 'text':
+                $sql .= "TEXT";
+                break;
+            
+            case 'date':
+                $sql .= "DATE";
+                break;
+            
+            case 'datetime':
+                $sql .= "DATETIME";
+                break;
+            
+            case 'decimal':
+                $length = !empty($field_length) ? $field_length : '10,2';
+                $sql .= "DECIMAL($length)";
+                break;
+            
+            default:
+                $length = !empty($field_length) ? $field_length : '255';
+                $sql .= "VARCHAR($length)";
+                break;
+        }
+        
+        // Add NULL/NOT NULL
+        $sql .= " $field_null";
+        
+        // Add DEFAULT if specified
+        if ($field_default !== '') {
+            if ($field_type === 'int' || $field_type === 'decimal') {
+                $sql .= " DEFAULT $field_default";
+            } else {
+                $sql .= " DEFAULT '$field_default'";
+            }
+        }
+        
+        // Add AUTO_INCREMENT if specified
+        if ($field_extra === 'auto_increment') {
+            $sql .= " AUTO_INCREMENT";
+        }
+        
+        return $sql;
+    }
+    
+    /**
+     * Generate SQL for modifying a column
+     *
+     * @param string $table_name Table name
+     * @param array $field Field definition
+     * @return string SQL statement
+     */
+    private function generate_modify_column_sql($table_name, $field) {
+        // Sanitize field properties
+        $field_name = sanitize_key($field['name']);
+        $field_type = strtolower(sanitize_text_field($field['type']));
+        $field_length = isset($field['length']) ? sanitize_text_field($field['length']) : '';
+        $field_null = isset($field['null']) && $field['null'] ? 'NULL' : 'NOT NULL';
+        $field_default = isset($field['default']) ? sanitize_text_field($field['default']) : '';
+        $field_extra = isset($field['extra']) ? sanitize_text_field($field['extra']) : '';
+        
+        $sql = "ALTER TABLE $table_name MODIFY COLUMN $field_name ";
+        
+        // Determine SQL type based on field type
+        switch ($field_type) {
+            case 'int':
+                $length = !empty($field_length) ? $field_length : '11';
+                $sql .= "INT($length)";
+                break;
+            
+            case 'varchar':
+                $length = !empty($field_length) ? $field_length : '255';
+                $sql .= "VARCHAR($length)";
+                break;
+            
+            case 'text':
+                $sql .= "TEXT";
+                break;
+            
+            case 'date':
+                $sql .= "DATE";
+                break;
+            
+            case 'datetime':
+                $sql .= "DATETIME";
+                break;
+            
+            case 'decimal':
+                $length = !empty($field_length) ? $field_length : '10,2';
+                $sql .= "DECIMAL($length)";
+                break;
+            
+            default:
+                $length = !empty($field_length) ? $field_length : '255';
+                $sql .= "VARCHAR($length)";
+                break;
+        }
+        
+        // Add NULL/NOT NULL
+        $sql .= " $field_null";
+        
+        // Add DEFAULT if specified
+        if ($field_default !== '') {
+            if ($field_type === 'int' || $field_type === 'decimal') {
+                $sql .= " DEFAULT $field_default";
+            } else {
+                $sql .= " DEFAULT '$field_default'";
+            }
+        }
+        
+        // Add AUTO_INCREMENT if specified
+        if ($field_extra === 'auto_increment') {
+            $sql .= " AUTO_INCREMENT";
+        }
+        
+        return $sql;
+    }
+    
+    /**
+     * Generate SQL for dropping a column
+     *
+     * @param string $table_name Table name
+     * @param string $field_name Field name
+     * @return string SQL statement
+     */
+    private function generate_drop_column_sql($table_name, $field_name) {
+        return "ALTER TABLE $table_name DROP COLUMN " . sanitize_key($field_name);
+    }
+    
+    /**
+     * Get available database tables
+     *
+     * @param bool $include_wp_tables Whether to include WordPress core tables
+     * @return array Array of table names
+     */
+    public function get_tables($include_wp_tables = true) {
+        global $wpdb;
+        
+        $tables = $wpdb->get_col("SHOW TABLES");
+        
+        if (!$include_wp_tables) {
+            $wp_core_tables = array(
+                $wpdb->prefix . 'commentmeta',
+                $wpdb->prefix . 'comments',
+                $wpdb->prefix . 'links',
+                $wpdb->prefix . 'options',
+                $wpdb->prefix . 'postmeta',
+                $wpdb->prefix . 'posts',
+                $wpdb->prefix . 'termmeta',
+                $wpdb->prefix . 'terms',
+                $wpdb->prefix . 'term_relationships',
+                $wpdb->prefix . 'term_taxonomy',
+                $wpdb->prefix . 'usermeta',
+                $wpdb->prefix . 'users',
+            );
+            
+            $tables = array_diff($tables, $wp_core_tables);
+        }
+        
+        return $tables;
+    }
+    
+    /**
+     * Get table structure
+     *
+     * @param string $table_name Table name
+     * @return array Table structure
+     */
+    public function get_table_structure($table_name) {
+        global $wpdb;
+        
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
+        
+        if (empty($columns)) {
+            return array();
+        }
+        
+        $structure = array();
+        
+        foreach ($columns as $column) {
+            $field = array(
+                'name' => $column->Field,
+                'type' => $this->get_field_type_from_sql($column->Type),
+                'length' => $this->get_field_length_from_sql($column->Type),
+                'null' => ($column->Null === 'YES'),
+                'default' => $column->Default,
+                'extra' => $column->Extra,
+                'key' => $column->Key,
+                'is_primary' => ($column->Key === 'PRI')
+            );
+            
+            $structure[] = $field;
+        }
+        
+        return $structure;
+    }
+    
+    /**
+     * Helper function to get field type from SQL definition
+     * 
+     * @param string $sql_type SQL type definition
+     * @return string Field type
+     */
+    private function get_field_type_from_sql($sql_type) {
+        $sql_type = strtolower($sql_type);
+        
+        if (strpos($sql_type, 'int') !== false) {
+            return 'int';
+        } elseif (strpos($sql_type, 'varchar') !== false) {
+            return 'varchar';
+        } elseif (strpos($sql_type, 'text') !== false) {
+            return 'text';
+        } elseif (strpos($sql_type, 'date') !== false && strpos($sql_type, 'datetime') === false) {
+            return 'date';
+        } elseif (strpos($sql_type, 'datetime') !== false) {
+            return 'datetime';
+        } elseif (strpos($sql_type, 'decimal') !== false || strpos($sql_type, 'float') !== false || strpos($sql_type, 'double') !== false) {
+            return 'decimal';
+        } else {
+            return 'text';
+        }
+    }
+    
+    /**
+     * Helper function to get field length from SQL definition
+     * 
+     * @param string $sql_type SQL type definition
+     * @return string Field length
+     */
+    private function get_field_length_from_sql($sql_type) {
+        if (preg_match('/\(([^)]+)\)/', $sql_type, $matches)) {
+            return $matches[1];
+        }
+        
+        return '';
     }
 }

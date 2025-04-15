@@ -24,13 +24,20 @@ if (!defined('ABSPATH')) {
         <div class="card">
             <h2><?php esc_html_e('Quick Start', 'custom-table-crud'); ?></h2>
             <ol>
-                <li><?php esc_html_e('Go to the Shortcode Generator', 'custom-table-crud'); ?></li>
-                <li><?php esc_html_e('Select a table from the list', 'custom-table-crud'); ?></li>
+                <li><?php esc_html_e('Go to the Table Manager to create a new table', 'custom-table-crud'); ?></li>
+                <li><?php esc_html_e('Or use the Shortcode Generator to display an existing table', 'custom-table-crud'); ?></li>
                 <li><?php esc_html_e('Configure which fields to display', 'custom-table-crud'); ?></li>
                 <li><?php esc_html_e('Copy the generated shortcode', 'custom-table-crud'); ?></li>
                 <li><?php esc_html_e('Paste the shortcode into any post or page', 'custom-table-crud'); ?></li>
             </ol>
-            <p><a href="<?php echo esc_url(admin_url('admin.php?page=custom_crud_shortcode')); ?>" class="button button-primary"><?php esc_html_e('Go to Shortcode Generator', 'custom-table-crud'); ?></a></p>
+            <div class="button-container">
+                <a href="<?php echo esc_url(admin_url('admin.php?page=custom_crud_table_manager')); ?>" class="button button-primary">
+                    <?php esc_html_e('Table Manager', 'custom-table-crud'); ?>
+                </a>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=custom_crud_shortcode')); ?>" class="button button-primary">
+                    <?php esc_html_e('Shortcode Generator', 'custom-table-crud'); ?>
+                </a>
+            </div>
         </div>
     </div>
     
@@ -56,9 +63,12 @@ if (!defined('ABSPATH')) {
                             <tr>
                                 <td><?php echo esc_html($table); ?></td>
                                 <td><?php echo esc_html($record_count); ?></td>
-                                <td>
+                                <td class="actions">
                                     <a href="<?php echo esc_url(add_query_arg(['page' => 'custom_crud_shortcode', 'table' => $table])); ?>" class="button button-small">
                                         <?php esc_html_e('Generate Shortcode', 'custom-table-crud'); ?>
+                                    </a>
+                                    <a href="<?php echo esc_url(add_query_arg(['page' => 'custom_crud_table_manager', 'tab' => 'edit', 'table' => $table])); ?>" class="button button-small">
+                                        <?php esc_html_e('Edit Structure', 'custom-table-crud'); ?>
                                     </a>
                                 </td>
                             </tr>
