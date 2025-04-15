@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Table manager template
@@ -36,11 +37,22 @@ if ($delete_table && $delete_confirmed && $delete_nonce_valid) {
     // Clean output buffer before redirect
     ob_clean();
     
-    // Redirect to remove query args
-    // JavaScript redirect instead of wp_redirect
-    echo '<script type="text/javascript">
-        window.location.href = "' . esc_url(remove_query_arg(array('delete_table', 'confirm_delete', '_wpnonce'))) . '";
-    </script>';
+    // Refresh the page to show updated table structure with form submission
+    $admin_url = admin_url('admin.php');
+    $current_page = 'custom_crud_table_manager';
+
+    // Use an auto-submitting form for the redirect
+    echo "
+    <form id='redirect_form' method='get' action='{$admin_url}'>
+        <input type='hidden' name='page' value='{$current_page}'>
+        <input type='hidden' name='tab' value='edit'>
+        <input type='hidden' name='table' value='{$table_name}'>
+        <input type='hidden' name='updated' value='1'>
+    </form>
+    <script type='text/javascript'>
+        document.getElementById('redirect_form').submit();
+    </script>
+    ";
     exit;
 }
 
@@ -82,7 +94,146 @@ if (isset($_POST['create_table']) && wp_verify_nonce($_POST['_wpnonce'], 'custom
         $message_type = 'success';
     }
 }
+
+
+// Process table modification (add, modify, delete columns)
+if (isset($_POST['operation']) && in_array($_POST['operation'], ['add_column', 'modify_column', 'delete_column']) 
+    && isset($_POST['table_name']) && wp_verify_nonce($_POST['_wpnonce'], 'custom_crud_modify_table')) {
+    
+    $table_name = sanitize_text_field($_POST['table_name']);
+    $operation = sanitize_text_field($_POST['operation']);
+    
+    if ($operation === 'add_column' && isset($_POST['add_column'])) {
+        // Process add column
+        $field_name = sanitize_key($_POST['field_name']);
+        $field_type = sanitize_text_field($_POST['field_type']);
+        $field_length = sanitize_text_field($_POST['field_length']);
+        $field_null = isset($_POST['field_null']);
+        $field_default = isset($_POST['field_default']) ? sanitize_text_field($_POST['field_default']) : '';
+        
+        $field = [
+            'name' => $field_name,
+            'type' => $field_type,
+            'length' => $field_length,
+            'null' => $field_null,
+            'default' => $field_default
+        ];
+        
+        $operations = [
+            [
+                'type' => 'add',
+                'field' => $field_name
+            ]
+        ];
+        
+        $result = $table_manager->modify_table($table_name, [$field], $operations);
+        
+        if (is_wp_error($result)) {
+            $message = $result->get_error_message();
+            $message_type = 'error';
+        } else {
+            $message = __('Column added successfully!', 'custom-table-crud');
+            $message_type = 'success';
+        }
+    } elseif ($operation === 'modify_column' && isset($_POST['modify_column'])) {
+        // Process modify column
+        $field_name = sanitize_key($_POST['field_name']);
+        $field_type = sanitize_text_field($_POST['field_type']);
+        $field_length = sanitize_text_field($_POST['field_length']);
+        $field_null = isset($_POST['field_null']);
+        $field_default = isset($_POST['field_default']) ? sanitize_text_field($_POST['field_default']) : '';
+        
+        $field = [
+            'name' => $field_name,
+            'type' => $field_type,
+            'length' => $field_length,
+            'null' => $field_null,
+            'default' => $field_default
+        ];
+        
+        $operations = [
+            [
+                'type' => 'modify',
+                'field' => $field_name
+            ]
+        ];
+        
+        $result = $table_manager->modify_table($table_name, [$field], $operations);
+        
+        if (is_wp_error($result)) {
+            $message = $result->get_error_message();
+            $message_type = 'error';
+        } else {
+            $message = __('Column modified successfully!', 'custom-table-crud');
+            $message_type = 'success';
+        }
+    } elseif ($operation === 'delete_column' && isset($_POST['delete_column'])) {
+        // Process delete column
+        $field_name = sanitize_key($_POST['field_name']);
+        
+        $operations = [
+            [
+                'type' => 'drop',
+                'field' => $field_name
+            ]
+        ];
+        
+        $result = $table_manager->modify_table($table_name, [], $operations);
+        
+        if (is_wp_error($result)) {
+            $message = $result->get_error_message();
+            $message_type = 'error';
+        } else {
+            $message = __('Column deleted successfully!', 'custom-table-crud');
+            $message_type = 'success';
+        }
+    }
+    
+    // Debugging approach - show all info and let user click to continue
+    global $pagenow;
+    $admin_url = admin_url('admin.php');
+    $current_page = 'custom_crud_table_manager'; // Hardcode the page name
+    $all_get_params = print_r($_GET, true);
+    $all_post_params = print_r($_POST, true);
+    $all_server_params = print_r($_SERVER, true);
+
+    $redirect_url = add_query_arg(
+        array(
+            'page' => $current_page,
+            'tab' => 'edit',
+            'table' => $table_name,
+            'updated' => '1'
+        ),
+        $admin_url
+    );
+
+    // // Stop redirect and show debug info
+    // echo "
+    // <div style='background:#fff; padding:20px; margin:20px; border:1px solid #ccc;'>
+    //     <h2>Debug Information</h2>
+    //     <p><strong>Current URL:</strong> {$_SERVER['REQUEST_URI']}</p>
+    //     <p><strong>Redirect URL:</strong> " . esc_url($redirect_url) . "</p>
+    //     <p><strong>Admin URL:</strong> {$admin_url}</p>
+    //     <p><strong>Current Page:</strong> {$current_page}</p>
+    //     <p><strong>Table Name:</strong> {$table_name}</p>
+    //     <p><strong>Pagenow:</strong> {$pagenow}</p>
+        
+    //     <h3>GET Parameters:</h3>
+    //     <pre>{$all_get_params}</pre>
+        
+    //     <h3>POST Parameters:</h3>
+    //     <pre>{$all_post_params}</pre>
+        
+    //     <h3>Manual continuation:</h3>
+    //     <p><a href='" . esc_url($redirect_url) . "' class='button button-primary'>Continue to Edit Page</a></p>
+    // </div>
+    // ";
+    // exit;
+
+}
+
 ?>
+
 
 <div class="wrap">
     <h1><?php esc_html_e('Table Manager', 'custom-table-crud'); ?></h1>
