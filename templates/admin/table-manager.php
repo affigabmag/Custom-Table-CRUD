@@ -37,22 +37,13 @@ if ($delete_table && $delete_confirmed && $delete_nonce_valid) {
     // Clean output buffer before redirect
     ob_clean();
     
-    // Refresh the page to show updated table structure with form submission
+    // Use JavaScript redirect instead of wp_redirect
     $admin_url = admin_url('admin.php');
     $current_page = 'custom_crud_table_manager';
-
-    // Use an auto-submitting form for the redirect
-    echo "
-    <form id='redirect_form' method='get' action='{$admin_url}'>
-        <input type='hidden' name='page' value='{$current_page}'>
-        <input type='hidden' name='tab' value='edit'>
-        <input type='hidden' name='table' value='{$table_name}'>
-        <input type='hidden' name='updated' value='1'>
-    </form>
-    <script type='text/javascript'>
-        document.getElementById('redirect_form').submit();
-    </script>
-    ";
+    
+    echo "<script type='text/javascript'>
+        window.location.href = '{$admin_url}?page={$current_page}&tab=list&message=" . urlencode($message) . "&message_type={$message_type}';
+    </script>";
     exit;
 }
 

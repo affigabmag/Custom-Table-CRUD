@@ -322,8 +322,8 @@ class Table_Manager {
                         continue;
                     }
                     
-                    $raw = $_POST[$field];
-                    
+                    $raw = isset($_POST[$field]) ? stripslashes($_POST[$field]) : '';
+                                        
                     // Sanitize based on field type
                     if ($meta['type'] === 'textarea') {
                         $value = sanitize_textarea_field($raw);
@@ -378,7 +378,7 @@ class Table_Manager {
                         ));
                         exit;
                     } else {
-                        $result = $wpdb->insert($table_name, $data, $format);
+                        $result = $wpdb->insert($table_name,$data, $format);
                         
                         if ($result !== false) {
                             $success_message = __('Record added successfully!', 'custom-table-crud');
@@ -520,7 +520,8 @@ class Table_Manager {
         
         // Loop through selected fields
         foreach ($display_fields as $field) {
-            $value = isset($row->$field) ? $row->$field : '';
+            $value = isset($row->$field) ? stripslashes($row->$field) : '';
+
             $type = isset($columns[$field]['type']) ? $columns[$field]['type'] : 'text';
             
             // Format output based on field type
