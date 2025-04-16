@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Custom Table CRUD
  * Description: CRUD for custom DB tables with working pagination inside shortcodes.
- * Version: 2.0
+ * Version: 2.1
  * Author: affigabmag
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
