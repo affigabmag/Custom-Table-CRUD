@@ -70,6 +70,8 @@
         
         // Get UI options
         const showRecordsCount = document.getElementById("showrecordscount")?.checked ? "true" : "false";
+        const showEdit = document.querySelector('input[name="showedit"]')?.checked ? "true" : "false";
+        const showDelete = document.querySelector('input[name="showdelete"]')?.checked ? "true" : "false";
         const showForm = document.getElementById("show_form")?.checked ? "true" : "false";
         const showTable = document.getElementById("show_table")?.checked ? "true" : "false";
         const showSearch = document.getElementById("show_search")?.checked ? "true" : "false";
@@ -102,7 +104,8 @@
         }
         
         // Build the shortcode
-        let shortcode = `[wp_table_manager pagination="${pagination}" table_view="${tableView}" showrecordscount="${showRecordsCount}" showform="${showForm}" showtable="${showTable}" showsearch="${showSearch}" showpagination="${showPagination}"${fieldsText}]`;
+        let shortcode = `[wp_table_manager pagination="${pagination}" table_view="${tableView}" showrecordscount="${showRecordsCount}" showform="${showForm}" showtable="${showTable}" showsearch="${showSearch}" showpagination="${showPagination}" showedit="${showEdit}" showdelete="${showDelete}"${fieldsText}]`;
+
         
         // Set the shortcode in the textarea
         const textarea = document.getElementById("shortcode_output");
@@ -296,3 +299,4 @@
     });
     
 })(jQuery);
+

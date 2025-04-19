@@ -103,6 +103,10 @@ if (!defined('ABSPATH')) {
                                 <input type="checkbox" id="showrecordscount" checked> 
                                 <?php esc_html_e('Records Count', 'custom-table-crud'); ?>
                             </label>
+                            
+                            <label><input type="checkbox" name="showedit" checked> Edit Row</label>
+                            <label><input type="checkbox" name="showdelete" checked> Delete Row</label>
+
                         </div>
                     </div>
                 </div>

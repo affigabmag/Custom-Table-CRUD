@@ -50,6 +50,8 @@ class Shortcode {
             'showtable' => 'true',
             'showsearch' => 'true',
             'showpagination' => 'true',
+            'showedit' => 'true',
+            'showdelete' => 'true'
         ];
         
         // Handle field attributes
