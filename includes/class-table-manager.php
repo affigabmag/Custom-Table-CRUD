@@ -281,7 +281,9 @@ class Table_Manager {
         $showsearch = isset($config['showsearch']) ? $config['showsearch'] : 'true';
         $showpagination = isset($config['showpagination']) ? $config['showpagination'] : 'true';
         $showrecordscount = isset($config['showrecordscount']) ? $config['showrecordscount'] : 'true';
-        
+        $showedit = isset($config['showedit']) ? $config['showedit'] : 'true';
+        $showdelete = isset($config['showdelete']) ? $config['showdelete'] : 'true';
+
         $editing = false;
         $edit_data = null;
         $success_message = '';
@@ -506,63 +508,74 @@ class Table_Manager {
     }
     
     /**
-     * Render a single table row
-     *
-     * @param object $row Data row
-     * @param array $columns Column definitions
-     * @param string $primary_key Primary key field name
-     * @return string HTML output
-     */
-    public function render_table_row($row, $columns, $primary_key) {
-        $output = '<tr>';
-        
-        $display_fields = array_keys($columns);
-        
-        // Loop through selected fields
-        foreach ($display_fields as $field) {
-            $value = isset($row->$field) ? stripslashes($row->$field) : '';
+ * Render a single table row
+ *
+ * @param object $row Data row
+ * @param array $columns Column definitions
+ * @param string $primary_key Primary key field name
+ * @param string $showedit Whether to show edit button ('true' or 'false')
+ * @param string $showdelete Whether to show delete button ('true' or 'false')
+ * @return string HTML output
+ */
+public function render_table_row($row, $columns, $primary_key, $showedit = 'true', $showdelete = 'true') {
+    $output = '<tr>';
+    
+    $display_fields = array_keys($columns);
+    
+    // Loop through selected fields
+    foreach ($display_fields as $field) {
+        $value = isset($row->$field) ? stripslashes($row->$field) : '';
 
-            $type = isset($columns[$field]['type']) ? $columns[$field]['type'] : 'text';
-            
-            // Format output based on field type
-            if ($type === 'url' && !empty($value)) {
-                $value = '<a href="' . esc_url($value) . '" target="_blank" rel="noopener noreferrer">' . esc_html($value) . '</a>';
-            } elseif ($type === 'textarea') {
-                $value = nl2br(esc_html($value));
-            } else {
-                $value = esc_html($value);
-            }
-            
-            $output .= '<td>' . $value . '</td>';
+        $type = isset($columns[$field]['type']) ? $columns[$field]['type'] : 'text';
+        
+        // Format output based on field type
+        if ($type === 'url' && !empty($value)) {
+            $value = '<a href="' . esc_url($value) . '" target="_blank" rel="noopener noreferrer">' . esc_html($value) . '</a>';
+        } elseif ($type === 'textarea') {
+            $value = nl2br(esc_html($value));
+        } else {
+            $value = esc_html($value);
         }
         
-        // Handle missing primary key safely
-        $record_id = isset($row->$primary_key) ? $row->$primary_key : null;
+        $output .= '<td>' . $value . '</td>';
+    }
+    
+    // Handle missing primary key safely
+    $record_id = isset($row->$primary_key) ? $row->$primary_key : null;
+    
+    if ($record_id !== null) {
+        $output .= '<td class="actions-column">';
         
-        if ($record_id !== null) {
-            $output .= '<td class="actions-column">';
-            
-            // Edit action
+        // Edit action - only show if showedit is true
+        if ($showedit === 'true') {
             $output .= '<a href="' . esc_url(add_query_arg([
                 'edit_record' => $record_id,
                 '_wpnonce' => wp_create_nonce('edit_record_' . $record_id)
             ])) . '" class="action-edit">' . esc_html__('Edit', 'custom-table-crud') . '</a>';
             
-            // Delete action
-            $output .= ' | <a href="' . esc_url(add_query_arg([
+            // Add separator if both buttons are shown
+            if ($showdelete === 'true') {
+                $output .= ' | ';
+            }
+        }
+        
+        // Delete action - only show if showdelete is true
+        if ($showdelete === 'true') {
+            $output .= '<a href="' . esc_url(add_query_arg([
                 'delete_record' => $record_id,
                 '_wpnonce' => wp_create_nonce('delete_record_' . $record_id)
             ])) . '" class="action-delete" data-confirm="' . esc_attr__('Are you sure?', 'custom-table-crud') . '">' . 
                 esc_html__('Delete', 'custom-table-crud') . '</a>';
-            
-            $output .= '</td>';
-        } else {
-            $output .= '<td><em>' . esc_html__('No Primary Key', 'custom-table-crud') . '</em></td>';
         }
         
-        $output .= '</tr>';
-        return $output;
+        $output .= '</td>';
+    } else {
+        $output .= '<td><em>' . esc_html__('No Primary Key', 'custom-table-crud') . '</em></td>';
     }
+    
+    $output .= '</tr>';
+    return $output;
+}
     
     /**
      * Get field definition by name from array of fields

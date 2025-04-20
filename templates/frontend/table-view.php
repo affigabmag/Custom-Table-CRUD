@@ -33,7 +33,7 @@ if (!defined('ABSPATH')) {
     <tbody>
         <?php if (!empty($rows)): ?>
             <?php foreach ($rows as $row): ?>
-                <?php echo $this->render_table_row($row, $columns, $primary_key); ?>
+                <?php echo $this->render_table_row($row, $columns, $primary_key, $showedit, $showdelete); ?>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
