@@ -104,9 +104,10 @@ if (!defined('ABSPATH')) {
                                 <?php esc_html_e('Records Count', 'custom-table-crud'); ?>
                             </label>
                             
+                            <label><input type="checkbox" name="showactions" checked> Actions Column</label>
                             <label><input type="checkbox" name="showedit" checked> Edit Row</label>
                             <label><input type="checkbox" name="showdelete" checked> Delete Row</label>
-
+                            
                         </div>
                     </div>
                 </div>
