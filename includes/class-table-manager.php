@@ -283,6 +283,7 @@ class Table_Manager {
         $showrecordscount = isset($config['showrecordscount']) ? $config['showrecordscount'] : 'true';
         $showedit = isset($config['showedit']) ? $config['showedit'] : 'true';
         $showdelete = isset($config['showdelete']) ? $config['showdelete'] : 'true';
+        $showactions = isset($config['showactions']) ? $config['showactions'] : 'true';  
 
         $editing = false;
         $edit_data = null;
@@ -507,7 +508,7 @@ class Table_Manager {
         return ob_get_clean();
     }
     
-    /**
+/**
  * Render a single table row
  *
  * @param object $row Data row
@@ -515,9 +516,10 @@ class Table_Manager {
  * @param string $primary_key Primary key field name
  * @param string $showedit Whether to show edit button ('true' or 'false')
  * @param string $showdelete Whether to show delete button ('true' or 'false')
+ * @param string $showactions Whether to show actions column ('true' or 'false')
  * @return string HTML output
  */
-public function render_table_row($row, $columns, $primary_key, $showedit = 'true', $showdelete = 'true') {
+public function render_table_row($row, $columns, $primary_key, $showedit = 'true', $showdelete = 'true', $showactions = 'true') {
     $output = '<tr>';
     
     $display_fields = array_keys($columns);
@@ -540,37 +542,40 @@ public function render_table_row($row, $columns, $primary_key, $showedit = 'true
         $output .= '<td>' . $value . '</td>';
     }
     
-    // Handle missing primary key safely
-    $record_id = isset($row->$primary_key) ? $row->$primary_key : null;
-    
-    if ($record_id !== null) {
-        $output .= '<td class="actions-column">';
+    // Show actions column only if showactions is true
+    if ($showactions === 'true') {
+        // Handle missing primary key safely
+        $record_id = isset($row->$primary_key) ? $row->$primary_key : null;
         
-        // Edit action - only show if showedit is true
-        if ($showedit === 'true') {
-            $output .= '<a href="' . esc_url(add_query_arg([
-                'edit_record' => $record_id,
-                '_wpnonce' => wp_create_nonce('edit_record_' . $record_id)
-            ])) . '" class="action-edit">' . esc_html__('Edit', 'custom-table-crud') . '</a>';
+        if ($record_id !== null) {
+            $output .= '<td class="actions-column">';
             
-            // Add separator if both buttons are shown
-            if ($showdelete === 'true') {
-                $output .= ' | ';
+            // Edit action - only show if showedit is true
+            if ($showedit === 'true') {
+                $output .= '<a href="' . esc_url(add_query_arg([
+                    'edit_record' => $record_id,
+                    '_wpnonce' => wp_create_nonce('edit_record_' . $record_id)
+                ])) . '" class="action-edit">' . esc_html__('Edit', 'custom-table-crud') . '</a>';
+                
+                // Add separator if both buttons are shown
+                if ($showdelete === 'true') {
+                    $output .= ' | ';
+                }
             }
+            
+            // Delete action - only show if showdelete is true
+            if ($showdelete === 'true') {
+                $output .= '<a href="' . esc_url(add_query_arg([
+                    'delete_record' => $record_id,
+                    '_wpnonce' => wp_create_nonce('delete_record_' . $record_id)
+                ])) . '" class="action-delete" data-confirm="' . esc_attr__('Are you sure?', 'custom-table-crud') . '">' . 
+                    esc_html__('Delete', 'custom-table-crud') . '</a>';
+            }
+            
+            $output .= '</td>';
+        } else {
+            $output .= '<td><em>' . esc_html__('No Primary Key', 'custom-table-crud') . '</em></td>';
         }
-        
-        // Delete action - only show if showdelete is true
-        if ($showdelete === 'true') {
-            $output .= '<a href="' . esc_url(add_query_arg([
-                'delete_record' => $record_id,
-                '_wpnonce' => wp_create_nonce('delete_record_' . $record_id)
-            ])) . '" class="action-delete" data-confirm="' . esc_attr__('Are you sure?', 'custom-table-crud') . '">' . 
-                esc_html__('Delete', 'custom-table-crud') . '</a>';
-        }
-        
-        $output .= '</td>';
-    } else {
-        $output .= '<td><em>' . esc_html__('No Primary Key', 'custom-table-crud') . '</em></td>';
     }
     
     $output .= '</tr>';

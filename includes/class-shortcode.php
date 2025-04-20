@@ -51,7 +51,8 @@ public function handle_shortcode($atts = []) {
         'showsearch' => 'true',
         'showpagination' => 'true',
         'showedit' => 'true',
-        'showdelete' => 'true'
+        'showdelete' => 'true',
+        'showactions' => 'true'  
     ];
     
     // Handle field attributes
@@ -107,6 +108,7 @@ public function handle_shortcode($atts = []) {
         'showpagination' => strtolower($atts['showpagination']),
         'showedit' => strtolower($atts['showedit']),
         'showdelete' => strtolower($atts['showdelete']),
+        'showactions' => strtolower($atts['showactions'])
     ];
     
     // Generate the table HTML

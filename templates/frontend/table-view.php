@@ -27,17 +27,17 @@ if (!defined('ABSPATH')) {
                     </a>
                 </th>
             <?php endforeach; ?>
-            <th><?php esc_html_e('Actions', 'custom-table-crud'); ?></th>
-        </tr>
+            <?php if ($showactions === 'true'): ?>
+                <th><?php esc_html_e('Actions', 'custom-table-crud'); ?></th>
+            <?php endif; ?>        </tr>
     </thead>
     <tbody>
         <?php if (!empty($rows)): ?>
             <?php foreach ($rows as $row): ?>
-                <?php echo $this->render_table_row($row, $columns, $primary_key, $showedit, $showdelete); ?>
-            <?php endforeach; ?>
+                <?php echo $this->render_table_row($row, $columns, $primary_key, $showedit, $showdelete, $showactions); ?>            <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="<?php echo count($columns) + 1; ?>">
+                <td colspan="<?php echo count($columns) + ($showactions === 'true' ? 1 : 0); ?>">
                     <?php esc_html_e('No records found.', 'custom-table-crud'); ?>
                 </td>
             </tr>
