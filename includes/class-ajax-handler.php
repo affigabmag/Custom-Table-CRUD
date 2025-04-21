@@ -85,7 +85,7 @@ class Ajax_Handler {
             echo '<input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" placeholder="' . esc_attr__('Display Name', 'custom-table-crud') . '">';
             
             echo '<select name="type_' . esc_attr($name) . '">';
-            $types = ['text', 'number', 'date', 'datetime', 'textarea', 'email', 'url', 'tel', 'password'];
+            $types = ['text', 'number', 'date', 'datetime', 'textarea', 'email', 'url', 'tel', 'password', 'checkbox'];
             foreach ($types as $t) {
                 $selected = ($type === $t) ? ' selected' : '';
                 echo '<option value="' . esc_attr($t) . '"' . $selected . '>' . esc_html($t) . '</option>';

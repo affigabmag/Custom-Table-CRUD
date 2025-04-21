@@ -92,7 +92,8 @@
                 const displayname = wrapper.querySelector("input[name^=displayname_]").value || fieldname;
                 const displaytype = wrapper.querySelector("select[name^=type_]").value;
                 const readonlyCheckbox = wrapper.querySelector("input[name^=readonly_]");
-                const readonly = readonlyCheckbox && readonlyCheckbox.checked ? ";readonly=true" : "";
+                // Always include readonly with true/false value instead of conditionally adding it
+                const readonly = ";readonly=" + (readonlyCheckbox && readonlyCheckbox.checked ? "true" : "false");
                 
                 fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}${readonly}"`;
                 fieldIndex++;
@@ -106,7 +107,6 @@
         
         // Build the shortcode
         let shortcode = `[wp_table_manager pagination="${pagination}" table_view="${tableView}" showrecordscount="${showRecordsCount}" showform="${showForm}" showtable="${showTable}" showsearch="${showSearch}" showpagination="${showPagination}" showedit="${showEdit}" showdelete="${showDelete}" showactions="${showActions}"${fieldsText}]`;
-
         
         // Set the shortcode in the textarea
         const textarea = document.getElementById("shortcode_output");
@@ -226,8 +226,6 @@
             }
         });
 
-        
-
         // Trigger change to populate initial values
         $('#modify_field_name').trigger('change');
     }
@@ -295,9 +293,6 @@
         $(document).on('click', '.cancel-delete', function () {
             $(this).closest('.delete-confirmation').remove();
         });
-        
-
     });
     
 })(jQuery);
-

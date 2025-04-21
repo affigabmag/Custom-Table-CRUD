@@ -145,7 +145,7 @@ public function handle_shortcode($atts = []) {
                     $columns[$col['fieldname']] = [
                         'label' => $col['displayname'],
                         'type' => $col['displaytype'],
-                        'readonly' => isset($col['readonly']) && $col['readonly'] === 'true' ? 'true' : 'false'
+                        'readonly' => isset($col['readonly']) ? $col['readonly'] : 'false'
                     ];
                 }
             }
