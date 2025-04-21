@@ -43,6 +43,12 @@ if (!defined('ABSPATH')) {
                     rows="3" 
                     required><?php echo esc_textarea($value); ?></textarea>
             
+                    <?php elseif ($type === 'checkbox'): ?>
+            <input type="checkbox" 
+                name="<?php echo esc_attr($field); ?>" 
+                value="1" 
+                <?php checked($value, '1'); ?>>
+                
             <?php else: ?>
                 <?php 
                 $step = ($type === 'number') ? ' step="any"' : '';

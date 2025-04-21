@@ -24,12 +24,21 @@
         $('.custom-table-crud-form').on('submit', function(e) {
             let valid = true;
             
+            // Handle required fields (except checkboxes)
             $(this).find('input[required], textarea[required]').each(function() {
-                if (!$(this).val().trim()) {
+                if ($(this).attr('type') !== 'checkbox' && !$(this).val().trim()) {
                     $(this).addClass('error');
                     valid = false;
                 } else {
                     $(this).removeClass('error');
+                }
+            });
+            
+            // Handle unchecked checkboxes (ensure they have a value of 0)
+            $(this).find('input[type="checkbox"]').each(function() {
+                if (!$(this).is(':checked') && !$(this).siblings('input[type="hidden"][name="' + $(this).attr('name') + '"]').length) {
+                    // Add a hidden field with value 0 for unchecked checkboxes
+                    $(this).after('<input type="hidden" name="' + $(this).attr('name') + '" value="0">');
                 }
             });
             
