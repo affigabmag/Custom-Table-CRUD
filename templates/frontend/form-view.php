@@ -43,11 +43,20 @@ if (!defined('ABSPATH')) {
                     rows="3" 
                     required><?php echo esc_textarea($value); ?></textarea>
             
-                    <?php elseif ($type === 'checkbox'): ?>
-            <input type="checkbox" 
-                name="<?php echo esc_attr($field); ?>" 
-                value="1" 
-                <?php checked($value, '1'); ?>>
+            <?php elseif ($type === 'checkbox'): ?>
+                <input type="checkbox" 
+                    name="<?php echo esc_attr($field); ?>" 
+                    value="1" 
+                    <?php checked($value, '1'); ?>>
+
+            <?php elseif ($type === 'key-value'): ?>
+                <select name="<?php echo esc_attr($field); ?>" 
+                        id="<?php echo esc_attr($field); ?>"
+                        class="key-value-select" 
+                        style="width: 100%;"
+                        <?php echo $readonly ? 'disabled' : ''; ?>>
+                    <option value=""><?php esc_html_e('Search...', 'custom-table-crud'); ?></option>
+                </select>
                 
             <?php else: ?>
                 <?php 

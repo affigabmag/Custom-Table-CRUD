@@ -20,6 +20,14 @@
             }
         });
         
+        // Initialize Select2 for key-value fields
+        $('.key-value-select').select2({
+            placeholder: 'Search...',
+            allowClear: true,
+            minimumInputLength: 1,
+            width: '100%'
+        });
+        
         // Enhance form validation
         $('.custom-table-crud-form').on('submit', function(e) {
             let valid = true;

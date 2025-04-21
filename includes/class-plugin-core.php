@@ -81,6 +81,7 @@ class Plugin_Core {
      * @return void
      */
     public function enqueue_frontend_assets() {
+        // Enqueue plugin CSS
         wp_enqueue_style(
             'custom-table-crud-style', 
             CUSTOM_TABLE_CRUD_URL . 'assets/css/custom-table-crud.css', 
@@ -88,10 +89,25 @@ class Plugin_Core {
             CUSTOM_TABLE_CRUD_VERSION
         );
         
+        // Enqueue Select2 CSS and JS
+        wp_enqueue_style(
+            'select2',
+            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
+        );
+        
+        wp_enqueue_script(
+            'select2',
+            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+            array('jquery'),
+            null,
+            true
+        );
+        
+        // Enqueue plugin JS
         wp_enqueue_script(
             'custom-table-crud-script', 
             CUSTOM_TABLE_CRUD_URL . 'assets/js/custom-table-crud.js', 
-            array('jquery'), 
+            array('jquery', 'select2'), 
             CUSTOM_TABLE_CRUD_VERSION, 
             true
         );
