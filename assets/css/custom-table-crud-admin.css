@@ -288,3 +288,21 @@
     transform: rotate(90deg);
     transition: transform 0.3s ease-in-out;
 }
+
+/* Styles for key-value query textarea */
+.field-wrapper .key-value-query {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.field-wrapper .key-value-textarea {
+    width: 100%;
+    height: 100px;
+    font-family: monospace;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}

@@ -38,7 +38,7 @@ class Ajax_Handler {
             ));
         }
         
-        // Verify the nonce with less strict check
+        // Verify the nonce
         if (!wp_verify_nonce($_POST['nonce'], 'custom_crud_admin_nonce')) {
             wp_send_json_error(array(
                 'message' => __('Security check failed: Invalid nonce', 'custom-table-crud')
@@ -55,7 +55,7 @@ class Ajax_Handler {
         
         global $wpdb;
         
-        // Direct SQL query for SHOW COLUMNS - avoiding prepared statement for this case
+        // Get table columns
         $columns = $wpdb->get_results("SHOW COLUMNS FROM {$table}");
         
         if (empty($columns)) {
@@ -79,24 +79,51 @@ class Ajax_Handler {
                 $type = 'textarea';
             }
             
+            // Start field wrapper
             echo '<div class="field-wrapper">';
+            
+            // Checkbox and label
             echo '<label><input type="checkbox" class="field-checkbox" value="' . esc_attr($name) . '" checked> ' . esc_html($name) . '</label>';
             
+            // Display name input
             echo '<input type="text" name="displayname_' . esc_attr($name) . '" value="' . esc_attr($name) . '" placeholder="' . esc_attr__('Display Name', 'custom-table-crud') . '">';
             
+            // Field type select
             echo '<select name="type_' . esc_attr($name) . '">';
-            $types = ['text', 'number', 'date', 'datetime', 'textarea', 'email', 'url', 'tel', 'password', 'checkbox'];
+            $types = [
+                'checkbox',
+                'date',
+                'datetime',
+                'email',
+                'key-value',
+                'number',
+                'password',
+                'tel',
+                'text',
+                'textarea',
+                'url'
+            ];
+            
             foreach ($types as $t) {
                 $selected = ($type === $t) ? ' selected' : '';
                 echo '<option value="' . esc_attr($t) . '"' . $selected . '>' . esc_html($t) . '</option>';
             }
             echo '</select>';
             
+            // Add key-value query textarea (hidden by default)
+            echo '<div class="key-value-query" style="display:none;">';
+            echo '<textarea name="query_' . esc_attr($name) . '" 
+                placeholder="' . esc_attr__('SELECT id, name FROM table WHERE status = 1', 'custom-table-crud') . '" 
+                class="key-value-textarea"></textarea>';
+            echo '</div>';
+            
+            // Read only checkbox
             echo '<label class="readonly-label">';
             echo '<input type="checkbox" name="readonly_' . esc_attr($name) . '" class="readonly-checkbox">';
             echo esc_html__('Read Only', 'custom-table-crud');
             echo '</label>';
             
+            // Close field wrapper
             echo '</div>';
         }
         

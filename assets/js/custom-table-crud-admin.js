@@ -95,7 +95,12 @@
                 // Always include readonly with true/false value instead of conditionally adding it
                 const readonly = ";readonly=" + (readonlyCheckbox && readonlyCheckbox.checked ? "true" : "false");
                 
-                fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}${readonly}"`;
+                if (displaytype === 'key-value') {
+                    const query = wrapper.querySelector(".key-value-textarea").value;
+                    fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype};query=${query}${readonly}"`;
+                } else {
+                    fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}${readonly}"`;
+                }
                 fieldIndex++;
             }
         });
@@ -208,6 +213,9 @@
         
         // Confirm table deletion
         $(document).on('click', '.cancel-delete', function () {
+
+
+
             $(this).closest('.delete-confirmation').remove();
         });
         
@@ -275,7 +283,7 @@
         }
         
         // Add click handler for table selection
-        $('.table-selection-container tr').on('click', function() {
+        $('.table-seleget_table_fields ction-container tr').on('click', function() {
             const tableLink = $(this).find('a').attr('href');
             if (tableLink) {
                 window.location.href = tableLink;
@@ -284,6 +292,15 @@
         
         // Initialize table manager functionality
         initTableManager();
+
+        $(document).on('change', 'select[name^="type_"]', function() {
+            const keyValueQuery = $(this).closest('.field-wrapper').find('.key-value-query');
+            if ($(this).val() === 'key-value') {
+                keyValueQuery.show();
+            } else {
+                keyValueQuery.hide();
+            }
+        });
 
         // Refresh tables button
         $('#refresh-tables').on('click', function () {
