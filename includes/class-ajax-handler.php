@@ -111,11 +111,13 @@ class Ajax_Handler {
             echo '</select>';
             
             // Add key-value query textarea (hidden by default)
-            echo '<div class="key-value-query" style="display:none;">';
+            echo '<div class="key-value-query-box"><div class="key-value-query" style="display:none;">';
             echo '<textarea name="query_' . esc_attr($name) . '" 
                 placeholder="' . esc_attr__('SELECT id, name FROM table WHERE status = 1', 'custom-table-crud') . '" 
                 class="key-value-textarea"></textarea>';
             echo '</div>';
+            echo '</div>';
+
             
             // Read only checkbox
             echo '<label class="readonly-label">';

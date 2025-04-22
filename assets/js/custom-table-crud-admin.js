@@ -296,7 +296,7 @@
         $(document).on('change', 'select[name^="type_"]', function() {
             const keyValueQuery = $(this).closest('.field-wrapper').find('.key-value-query');
             if ($(this).val() === 'key-value') {
-                keyValueQuery.show();
+                keyValueQuery.wrap('<div class="key-value-query-box"></div>').show();
             } else {
                 keyValueQuery.hide();
             }
