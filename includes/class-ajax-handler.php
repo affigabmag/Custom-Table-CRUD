@@ -91,18 +91,19 @@ class Ajax_Handler {
             // Field type select
             echo '<select name="type_' . esc_attr($name) . '">';
             $types = [
-                'checkbox',
-                'date',
-                'datetime',
-                'email',
-                'key-value',
-                'number',
-                'password',
-                'tel',
-                'text',
-                'textarea',
-                'url'
-            ];
+                'checkbox', 
+                'date', 
+                'datetime', 
+                'email', 
+                'key-value', 
+                'number', 
+                'password', 
+                'query', 
+                'tel', 
+                'text', 
+                'textarea', 
+                'url'];
+
             
             foreach ($types as $t) {
                 $selected = ($type === $t) ? ' selected' : '';

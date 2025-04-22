@@ -95,8 +95,8 @@
                 // Always include readonly with true/false value instead of conditionally adding it
                 const readonly = ";readonly=" + (readonlyCheckbox && readonlyCheckbox.checked ? "true" : "false");
                 
-                if (displaytype === 'key-value') {
-                    const query = wrapper.querySelector(".key-value-textarea").value;
+                if (displaytype === 'key-value' || displaytype === 'query') {
+                    const query = wrapper.querySelector(".key-value-textarea")?.value || "";
                     fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype};query=${query}${readonly}"`;
                 } else {
                     fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}${readonly}"`;
@@ -295,7 +295,7 @@
 
         $(document).on('change', 'select[name^="type_"]', function() {
             const keyValueQuery = $(this).closest('.field-wrapper').find('.key-value-query');
-            if ($(this).val() === 'key-value') {
+            if ($(this).val() === 'key-value' || $(this).val() === 'query') {
                 keyValueQuery.wrap('<div class="key-value-query-box"></div>').show();
             } else {
                 keyValueQuery.hide();
