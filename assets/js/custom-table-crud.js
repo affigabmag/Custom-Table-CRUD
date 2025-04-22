@@ -42,6 +42,13 @@
                 }
             });
             
+            // Validate phone number fields
+            $(this).find('input[type="tel"]').each(function() {
+                if ($(this).val().trim() && !validatePhoneNumber($(this))) {
+                    valid = false;
+                }
+            });
+
             // Handle unchecked checkboxes (ensure they have a value of 0)
             $(this).find('input[type="checkbox"]').each(function() {
                 if (!$(this).is(':checked') && !$(this).siblings('input[type="hidden"][name="' + $(this).attr('name') + '"]').length) {
@@ -70,4 +77,23 @@
     // Initialize when document is ready
     $(document).ready(init);
     
+
+    // Phone number validation function
+    function validatePhoneNumber(input) {
+        const value = input.val();
+        const pattern = /^(\+\d{1,3})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})$/;
+        
+        if (!pattern.test(value)) {
+            input.addClass('error');
+            if (input.next('.error-message').length === 0) {
+                input.after('<small class="error-message">Please enter a valid phone number (e.g., +1 123-456-7890)</small>');
+            }
+            return false;
+        } else {
+            input.removeClass('error');
+            input.next('.error-message').remove();
+            return true;
+        }
+    }
+
 })(jQuery);

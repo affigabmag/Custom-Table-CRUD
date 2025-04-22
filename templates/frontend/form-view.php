@@ -77,16 +77,17 @@ if (!defined('ABSPATH')) {
                     });
                 </script>
                 
-            <?php else: ?>
-                <?php 
-                $step = ($type === 'number') ? ' step="any"' : '';
-                $pattern = ($type === 'url') ? ' pattern="https?://.+"' : '';
-                ?>
-                <input type="<?php echo esc_attr($type); ?>" 
-                    name="<?php echo esc_attr($field); ?>" 
-                    value="<?php echo esc_attr($value); ?>" 
-                    required<?php echo $step . $pattern; ?>>
-            <?php endif; ?>
+                <?php else: ?>
+                    <?php 
+                    $step = ($type === 'number') ? ' step="any"' : '';
+                    $pattern = ($type === 'url') ? ' pattern="https?://.+"' : '';
+                    $pattern = ($type === 'tel') ? ' pattern="(\+\d{1,3})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})"' : $pattern;
+                    ?>
+                    <input type="<?php echo esc_attr($type); ?>" 
+                        name="<?php echo esc_attr($field); ?>" 
+                        value="<?php echo esc_attr($value); ?>" 
+                        required<?php echo $step . $pattern; ?>>
+                <?php endif; ?>
             
             <?php if ($error): ?>
                 <br><small class="error-message"><?php esc_html_e('This field is required.', 'custom-table-crud'); ?></small>
