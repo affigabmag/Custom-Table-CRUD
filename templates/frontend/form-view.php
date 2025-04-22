@@ -20,6 +20,18 @@ if (!defined('ABSPATH')) {
     <?php endif; ?>
     
     <?php foreach ($columns as $field => $meta): 
+        if (in_array($meta['type'], ['key-value', 'query'])) {
+            echo '<p>';
+            echo '<label for="' . esc_attr($field) . '">' . esc_html($meta['label']) . '</label>';
+            echo '<select name="' . esc_attr($field) . '" class="custom-field-select">';
+            echo '<option value="">-- Select --</option>';
+            echo '</select>';
+            echo '</p>';
+            
+            continue;
+        }
+    
+    
         $label = isset($meta['label']) ? $meta['label'] : $field;
         $type = isset($meta['type']) ? $meta['type'] : 'text';
         $readonly = isset($meta['readonly']) && $meta['readonly'] === 'true';
@@ -53,10 +65,17 @@ if (!defined('ABSPATH')) {
                 <select name="<?php echo esc_attr($field); ?>" 
                         id="<?php echo esc_attr($field); ?>"
                         class="key-value-select" 
-                        style="width: 100%;"
                         <?php echo $readonly ? 'disabled' : ''; ?>>
                     <option value=""><?php esc_html_e('Search...', 'custom-table-crud'); ?></option>
                 </select>
+                <script>
+                    jQuery(document).ready(function($) {
+                        $('#<?php echo esc_attr($field); ?>').select2({
+                            width: '100%',
+                            dropdownParent: $('.custom-table-crud-form')
+                        });
+                    });
+                </script>
                 
             <?php else: ?>
                 <?php 
@@ -87,4 +106,17 @@ if (!defined('ABSPATH')) {
             </a>
         <?php endif; ?>
     </div>
+
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        jQuery(document).ready(function($) {
+            $('.custom-field-select').select2({
+                width: '100%',
+                dropdownParent: $('.custom-table-crud-form')
+            });
+        });
+    </script>
+
 </form>

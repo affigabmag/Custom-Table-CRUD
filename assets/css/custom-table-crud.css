@@ -108,9 +108,16 @@
 .custom-table-crud-form p {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 15px;
     gap: 10px;
+}
+
+@media screen and (max-width: 768px) {
+    .custom-table-crud-form p {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 .custom-table-crud-form label {
@@ -297,4 +304,55 @@
     background-color: #fde8e8;
     border-left: 4px solid #dc3232;
     color: #a72020;
+}
+
+.form-field select.custom-field-select {
+    margin-top: 4px;
+}
+
+/* Select2 custom styling */
+.select2-container {
+    width: 100% !important;
+    min-width: 250px;
+}
+
+.select2-dropdown {
+    z-index: 999999;
+}
+
+.custom-table-crud-form p .select2-container {
+    flex: 1;
+}
+
+.custom-table-crud-form .select2-container .select2-selection--single {
+    height: 36px;
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.custom-table-crud-form .select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 28px;
+}
+
+.custom-table-crud-form .select2-container .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+
+.custom-table-crud-form .select2-container--open .select2-dropdown {
+    z-index: 99999;
+}
+
+.custom-table-crud-form .select2-container {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.custom-table-crud-form .select2-container--default .select2-selection--single {
+    border-color: #ddd;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.07);
+}
+
+.custom-table-crud-form script + .select2 {
+    margin-top: 0;
 }
