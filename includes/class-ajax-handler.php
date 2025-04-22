@@ -111,6 +111,13 @@ class Ajax_Handler {
             }
             echo '</select>';
             
+            
+            // Read only checkbox
+            echo '<label class="readonly-label">';
+            echo '<input type="checkbox" name="readonly_' . esc_attr($name) . '" class="readonly-checkbox">';
+            echo esc_html__('Read Only', 'custom-table-crud');
+            echo '</label>';
+
             // Add key-value query textarea (hidden by default)
             echo '<div class="key-value-query-box"><div class="key-value-query" style="display:none;">';
             echo '<textarea name="query_' . esc_attr($name) . '" 
@@ -119,13 +126,6 @@ class Ajax_Handler {
             echo '</div>';
             echo '</div>';
 
-            
-            // Read only checkbox
-            echo '<label class="readonly-label">';
-            echo '<input type="checkbox" name="readonly_' . esc_attr($name) . '" class="readonly-checkbox">';
-            echo esc_html__('Read Only', 'custom-table-crud');
-            echo '</label>';
-            
             // Close field wrapper
             echo '</div>';
         }
