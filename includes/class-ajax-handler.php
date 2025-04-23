@@ -194,7 +194,6 @@ class Ajax_Handler {
             }
             echo '</select>';
             
-            
             // Read only checkbox
             echo '<label class="readonly-label">';
             echo '<input type="checkbox" name="readonly_' . esc_attr($name) . '" class="readonly-checkbox">';
@@ -203,9 +202,24 @@ class Ajax_Handler {
 
             // Add key-value query textarea (hidden by default)
             echo '<div class="key-value-query-box"><div class="key-value-query" style="display:none;">';
-            echo '<textarea name="query_' . esc_attr($name) . '" 
-                placeholder="' . esc_attr__('Please note: only the 1st column will be shown, example query: SELECT id, name FROM table WHERE status = 1', 'custom-table-crud') . '" 
-                class="key-value-textarea"></textarea>';
+            // Check the type of field and show different placeholder
+            if ($type === 'key-value') {
+                echo '<textarea name="query_' . esc_attr($name) . '" 
+                    placeholder="KEY-VALUE TYPE: Only the 1st column will be shown as value, 2nd column as text.
+            Example: SELECT id, name FROM wp_users WHERE user_status = 0" 
+                    class="key-value-textarea"></textarea>';
+            } else if ($type === 'query') {
+                echo '<textarea name="query_' . esc_attr($name) . '" 
+                    placeholder="QUERY TYPE: Results will be loaded of the 1st column  the results.
+            Example: SELECT id, display_name FROM wp_users WHERE ID > 0" 
+                    class="key-value-textarea"></textarea>';
+            } else {
+                // Default placeholder
+                echo '<textarea name="query_' . esc_attr($name) . '" 
+                    placeholder="Please note: only the 1st column will be shown, example query: SELECT id, name FROM table WHERE status = 1" 
+                    class="key-value-textarea"></textarea>';
+            }
+
             echo '</div>';
             echo '</div>';
 

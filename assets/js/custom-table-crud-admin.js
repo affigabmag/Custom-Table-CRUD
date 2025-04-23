@@ -311,6 +311,24 @@
         $(document).on('click', '.cancel-delete', function () {
             $(this).closest('.delete-confirmation').remove();
         });
+
+        // Change placeholder text when field type changes
+        $(document).on('change', 'select[name^="type_"]', function() {
+            const fieldType = $(this).val();
+            const $wrapper = $(this).closest('.field-wrapper');
+            const $textarea = $wrapper.find('.key-value-textarea');
+            
+            if (fieldType === 'key-value') {
+                $textarea.attr('placeholder', 'KEY-VALUE TYPE: Query must have at least two columns. 1st is the Key and the 2nd is the value.\nOnly the 1st column will be shown as Key, 2nd column as Value.\nExample: SELECT id, name FROM wp_users WHERE user_status = 0');
+                $wrapper.find('.key-value-query').show();
+            } else if (fieldType === 'query') {
+                $textarea.attr('placeholder', 'QUERY TYPE: Only 1st colum of the Results will be loaded dynamically.\nExample: SELECT id, display_name FROM wp_users WHERE ID > 0');
+                $wrapper.find('.key-value-query').show();
+            } else {
+                $wrapper.find('.key-value-query').hide();
+            }
+        });
+
     });
     
 })(jQuery);
