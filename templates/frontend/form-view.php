@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
         if ($meta['type'] === 'key-value') {
             echo '<p>';
             echo '<label for="' . esc_attr($field) . '">' . esc_html($meta['label']) . '</label>';
-            echo '<select name="' . esc_attr($field) . '" class="key-value-select">';
+            echo '<select name="' . esc_attr($field) . '" class="key-value-select" data-options=\'' . json_encode($meta['options']) . '\'>';
             echo '<option value="">-- Select --</option>';
             echo '</select>';
             echo '</p>';

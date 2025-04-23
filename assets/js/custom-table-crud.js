@@ -21,13 +21,48 @@
         });
         
         // Initialize Select2 for key-value and query fields
-        $('.key-value-select, .query-select').select2({
-            placeholder: 'Search...',
-            allowClear: true,
-            minimumInputLength: 0,
-            width: '100%',
-            dropdownParent: $('.custom-table-crud-form')
+        $('.key-value-select, .query-select').each(function() {
+            const $select = $(this);
+            const query = $select.data('query');
+        
+            if ($select.hasClass('key-value-select') && $select.data('options')) {
+                const options = $select.data('options');
+                $select.select2({
+                    data: options,
+                    placeholder: 'Search...',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $('.custom-table-crud-form')
+                });
+            } else if (query) {
+                $select.select2({
+                    placeholder: 'Search...',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $('.custom-table-crud-form'),
+                    ajax: {
+                        url: ctcrudSettings.ajaxurl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                action: 'load_query_results',
+                                nonce: ctcrudSettings.nonce,
+                                query: query,
+                                search: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.success ? data.data.results : []
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
         });
+        
         
         // Enhance form validation
         $('.custom-table-crud-form').on('submit', function(e) {

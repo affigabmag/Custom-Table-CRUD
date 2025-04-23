@@ -147,12 +147,29 @@ public function handle_shortcode($atts = []) {
                         'type' => $col['displaytype'],
                         'readonly' => isset($col['readonly']) ? $col['readonly'] : 'false'
                     ];
-                    
-                    // Add query parameter if it exists
-                    if ($col['displaytype'] === 'query' && isset($col['query'])) {
+                
+                    if (isset($col['query'])) {
                         $columns[$col['fieldname']]['query'] = $col['query'];
+                        global $wpdb;
+                        $results = $wpdb->get_results($col['query'], ARRAY_N);
+                        $selectOptions = [];
+                
+                        if ($col['displaytype'] === 'key-value') {
+                            foreach ($results as $row) {
+                                if (count($row) >= 2) {
+                                    $selectOptions[] = ['id' => $row[0], 'text' => $row[1]];
+                                }
+                            }
+                        } elseif ($col['displaytype'] === 'query') {
+                            foreach ($results as $row) {
+                                $selectOptions[] = $row[0];
+                            }
+                        }
+                
+                        $columns[$col['fieldname']]['options'] = $selectOptions;
                     }
                 }
+                
             }
         }
         

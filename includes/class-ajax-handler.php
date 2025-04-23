@@ -61,20 +61,16 @@ class Ajax_Handler {
             wp_send_json_success(['results' => []]);
         }
         
-        // Format the results for Select2
         $formatted = [];
         foreach ($results as $row) {
             $keys = array_keys($row);
-            $id = $row[$keys[0]]; // First column becomes the value
-            $text = isset($row[$keys[1]]) ? $row[$keys[1]] : $id; // Second column (if exists) becomes the label
-            
-            $formatted[] = [
-                'id' => $id,
-                'text' => $text
-            ];
+            $id = $row[$keys[0]];
+            $text = isset($row[$keys[1]]) ? $row[$keys[1]] : $id;
+            $formatted[] = ['id' => $id, 'text' => $text];
         }
         
         wp_send_json_success(['results' => $formatted]);
+        
 
         // Log debug info
         if (defined('WP_DEBUG') && WP_DEBUG) {
