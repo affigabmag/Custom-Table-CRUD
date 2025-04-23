@@ -31,14 +31,51 @@ if (!defined('ABSPATH')) {
             continue;
         }
         
-        if ($meta['type'] === 'query') {
+        if ($meta['type'] === 'query' && isset($meta['query'])) {
             echo '<p>';
             echo '<label for="' . esc_attr($field) . '">' . esc_html($meta['label']) . '</label>';
-            echo '<select name="' . esc_attr($field) . '" class="basic-select2">';
+            echo '<select name="' . esc_attr($field) . '" id="' . esc_attr($field) . '" class="query-select">';
             echo '<option value="">-- Select --</option>';
-            echo '<option value="1">Option 1</option>';
-            echo '<option value="2">Option 2</option>';
             echo '</select>';
+            
+            echo '<script>
+            jQuery(document).ready(function($) {
+                console.log("Initializing Select2 for field: ' . esc_attr($field) . '");
+                console.log("Query: ' . esc_js($meta['query']) . '");
+                console.log("AJAX URL: ' . admin_url('admin-ajax.php') . '");
+                
+                // Make a direct AJAX call to test
+                $.ajax({
+                    url: "' . admin_url('admin-ajax.php') . '",
+                    type: "POST",
+                    data: {
+                        action: "load_query_results",
+                        nonce: "' . wp_create_nonce('crud_form_nonce') . '",
+                        query: "' . esc_js($meta['query']) . '"
+                    },
+                    success: function(response) {
+                        console.log("Direct AJAX test response:", response);
+                        if(response.success && response.data.results) {
+                            // Add options to select
+                            $.each(response.data.results, function(i, item) {
+                                $("#' . esc_attr($field) . '").append(new Option(item.text, item.id));
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                    }
+                });
+                
+                // Initialize Select2
+                $("#' . esc_attr($field) . '").select2({
+                    placeholder: "Search...",
+                    allowClear: true,
+                    width: "100%",
+                    dropdownParent: $(".custom-table-crud-form")
+                });
+            });
+            </script>';
             echo '</p>';
             
             continue;

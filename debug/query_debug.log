@@ -1,0 +1,9 @@
+
+==== FUNCTION CALLED: 2025-04-23 06:08:42 ====
+POST DATA: Array
+(
+    [action] => load_query_results
+    [nonce] => fac7ccbf7b
+    [query] => select * from wp_users
+)
+

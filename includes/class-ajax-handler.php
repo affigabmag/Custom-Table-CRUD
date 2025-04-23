@@ -32,6 +32,16 @@ class Ajax_Handler {
      * Handle loading query results for query-type fields
      */
     public function load_query_results() {
+
+        // Force logging regardless of the request
+        $log_file = WP_CONTENT_DIR . '/plugins/Custom-Table-CRUD/debug/query_debug.log';
+        $debug_dir = dirname($log_file);
+        if (!file_exists($debug_dir)) {
+            wp_mkdir_p($debug_dir);
+        }
+        file_put_contents($log_file, "\n==== FUNCTION CALLED: " . date('Y-m-d H:i:s') . " ====\n", FILE_APPEND);
+        file_put_contents($log_file, "POST DATA: " . print_r($_POST, true) . "\n", FILE_APPEND);
+
         // Check nonce for security
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'crud_form_nonce')) {
             wp_send_json_error(['message' => 'Invalid security token.']);
@@ -84,6 +94,18 @@ class Ajax_Handler {
             
             file_put_contents($log_file, $log_data, FILE_APPEND);
         }
+        // Add debug logging
+        $log_file = WP_CONTENT_DIR . '/plugins/Custom-Table-CRUD/debug/query_debug.log';
+        $debug_dir = dirname($log_file);
+        if (!file_exists($debug_dir)) {
+            wp_mkdir_p($debug_dir);
+        }
+        $timestamp = date('Y-m-d H:i:s');
+        $log_data = "\n==== [$timestamp] ====\n";
+        $log_data .= "Query: " . $query . "\n";
+        $log_data .= "Results: " . print_r($results, true) . "\n";
+        $log_data .= "Formatted: " . print_r($formatted, true) . "\n";
+        file_put_contents($log_file, $log_data, FILE_APPEND);
     }
 
     /**

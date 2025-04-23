@@ -98,6 +98,7 @@
                 if (displaytype === 'key-value' || displaytype === 'query') {
                     const query = wrapper.querySelector(".key-value-textarea")?.value || "";
                     fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype};query=${query}${readonly}"`;
+
                 } else {
                     fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}${readonly}"`;
                 }
