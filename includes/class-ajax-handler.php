@@ -204,7 +204,7 @@ class Ajax_Handler {
             // Add key-value query textarea (hidden by default)
             echo '<div class="key-value-query-box"><div class="key-value-query" style="display:none;">';
             echo '<textarea name="query_' . esc_attr($name) . '" 
-                placeholder="' . esc_attr__('SELECT id, name FROM table WHERE status = 1', 'custom-table-crud') . '" 
+                placeholder="' . esc_attr__('Please note: only the 1st column will be shown, example query: SELECT id, name FROM table WHERE status = 1', 'custom-table-crud') . '" 
                 class="key-value-textarea"></textarea>';
             echo '</div>';
             echo '</div>';
