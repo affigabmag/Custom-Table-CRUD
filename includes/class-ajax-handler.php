@@ -23,8 +23,69 @@ class Ajax_Handler {
         add_action('wp_ajax_delete_table', array($this, 'delete_table'));
         add_action('wp_ajax_get_table_structure', array($this, 'get_table_structure'));
         add_action('wp_ajax_modify_table', array($this, 'modify_table'));
+
+        add_action('wp_ajax_load_query_results', array($this, 'load_query_results'));
+        add_action('wp_ajax_nopriv_load_query_results', array($this, 'load_query_results'));
     }
     
+    /**
+     * Handle loading query results for query-type fields
+     */
+    public function load_query_results() {
+        // Check nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'crud_form_nonce')) {
+            wp_send_json_error(['message' => 'Invalid security token.']);
+        }
+        
+        // Get and sanitize the query
+        $query = isset($_POST['query']) ? sanitize_text_field($_POST['query']) : '';
+        if (empty($query)) {
+            wp_send_json_error(['message' => 'No query provided.']);
+        }
+        
+        // Execute the query
+        global $wpdb;
+        $results = $wpdb->get_results($query, ARRAY_A);
+        
+        if (empty($results)) {
+            wp_send_json_success(['results' => []]);
+        }
+        
+        // Format the results for Select2
+        $formatted = [];
+        foreach ($results as $row) {
+            $keys = array_keys($row);
+            $id = $row[$keys[0]]; // First column becomes the value
+            $text = isset($row[$keys[1]]) ? $row[$keys[1]] : $id; // Second column (if exists) becomes the label
+            
+            $formatted[] = [
+                'id' => $id,
+                'text' => $text
+            ];
+        }
+        
+        wp_send_json_success(['results' => $formatted]);
+
+        // Log debug info
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $log_file = CUSTOM_TABLE_CRUD_PATH . 'debug/query_debug.log';
+            
+            // Create debug directory if it doesn't exist
+            $debug_dir = dirname($log_file);
+            if (!file_exists($debug_dir)) {
+                wp_mkdir_p($debug_dir);
+            }
+            
+            $timestamp = date('Y-m-d H:i:s');
+            $log_data = "\n==== [$timestamp] ====\n";
+            $log_data .= "[QUERY]\n" . $query . "\n";
+            $log_data .= "[RESULTS]\n" . print_r($results, true) . "\n";
+            $log_data .= "[FORMATTED]\n" . print_r($formatted, true) . "\n";
+            
+            file_put_contents($log_file, $log_data, FILE_APPEND);
+        }
+    }
+
     /**
      * Get table fields and return as HTML
      * 

@@ -147,6 +147,11 @@ public function handle_shortcode($atts = []) {
                         'type' => $col['displaytype'],
                         'readonly' => isset($col['readonly']) ? $col['readonly'] : 'false'
                     ];
+                    
+                    // Add query parameter if it exists
+                    if ($col['displaytype'] === 'query' && isset($col['query'])) {
+                        $columns[$col['fieldname']]['query'] = $col['query'];
+                    }
                 }
             }
         }

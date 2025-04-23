@@ -20,11 +20,24 @@ if (!defined('ABSPATH')) {
     <?php endif; ?>
     
     <?php foreach ($columns as $field => $meta): 
-        if (in_array($meta['type'], ['key-value', 'query'])) {
+        if ($meta['type'] === 'key-value') {
             echo '<p>';
             echo '<label for="' . esc_attr($field) . '">' . esc_html($meta['label']) . '</label>';
-            echo '<select name="' . esc_attr($field) . '" class="custom-field-select">';
+            echo '<select name="' . esc_attr($field) . '" class="key-value-select">';
             echo '<option value="">-- Select --</option>';
+            echo '</select>';
+            echo '</p>';
+            
+            continue;
+        }
+        
+        if ($meta['type'] === 'query') {
+            echo '<p>';
+            echo '<label for="' . esc_attr($field) . '">' . esc_html($meta['label']) . '</label>';
+            echo '<select name="' . esc_attr($field) . '" class="basic-select2">';
+            echo '<option value="">-- Select --</option>';
+            echo '<option value="1">Option 1</option>';
+            echo '<option value="2">Option 2</option>';
             echo '</select>';
             echo '</p>';
             
@@ -111,13 +124,13 @@ if (!defined('ABSPATH')) {
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
-        jQuery(document).ready(function($) {
-            $('.custom-field-select').select2({
-                width: '100%',
-                dropdownParent: $('.custom-table-crud-form')
-            });
+    jQuery(document).ready(function($) {
+        $('.basic-select2').select2({
+            dropdownParent: $('.custom-table-crud-form')
         });
+    });
     </script>
 
 </form>

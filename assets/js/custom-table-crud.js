@@ -20,12 +20,13 @@
             }
         });
         
-        // Initialize Select2 for key-value fields
-        $('.key-value-select').select2({
+        // Initialize Select2 for key-value and query fields
+        $('.key-value-select, .query-select').select2({
             placeholder: 'Search...',
             allowClear: true,
-            minimumInputLength: 1,
-            width: '100%'
+            minimumInputLength: 0,
+            width: '100%',
+            dropdownParent: $('.custom-table-crud-form')
         });
         
         // Enhance form validation
@@ -70,6 +71,40 @@
             $(this).removeClass('error');
             if ($(this).closest('form').find('.error').length === 0) {
                 $(this).closest('form').find('.validation-message').remove();
+            }
+        });
+
+        // Initialize query-type fields
+        $('.query-select').each(function() {
+            const $select = $(this);
+            const query = $select.data('query');
+            
+            if (query) {
+                $select.select2({
+                    placeholder: 'Search...',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $('.custom-table-crud-form'),
+                    ajax: {
+                        url: ctcrudSettings.ajaxurl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                action: 'load_query_results',
+                                nonce: ctcrudSettings.nonce,
+                                query: query,
+                                search: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.success ? data.data.results : []
+                            };
+                        },
+                        cache: true
+                    }
+                });
             }
         });
     }
