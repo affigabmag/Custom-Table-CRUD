@@ -403,9 +403,11 @@ class Table_Manager {
                             $log_data .= "Original file: " . print_r($_FILES[$field], true) . "\n";
                             file_put_contents($log_file, $log_data, FILE_APPEND);
                             
-                            // Generate unique filename
+                            // Generate timestamped filename
                             $original_filename = $_FILES[$field]['name'];
-                            $unique_filename = wp_unique_filename($crud_dir, $original_filename);
+                            $timestamp = date('YmdHis'); // Format: yyyyMMddhhmmss
+                            $timestamped_filename = $timestamp . '_' . $original_filename;
+                            $unique_filename = wp_unique_filename($crud_dir, $timestamped_filename);
                             
                             file_put_contents($log_file, "Original filename: $original_filename\n", FILE_APPEND);
                             file_put_contents($log_file, "Unique filename: $unique_filename\n", FILE_APPEND);
