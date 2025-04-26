@@ -663,8 +663,7 @@ public function render_table_row($row, $columns, $primary_key, $showedit = 'true
             if ($value !== '' && $value !== null) {
                 $upload_dir = wp_upload_dir();
                 $file_url = $upload_dir['baseurl'] . '/crud-files/' . $value;
-                // $value = '<a href="' . esc_url($file_url) . '" target="_blank" rel="noopener noreferrer">View File: ' . esc_html($value) . '</a>';
-                $value = '<a href="' . esc_url($file_url) . '" target="_blank" rel="noopener noreferrer">View File: ' . esc_html($value) . '</a>';
+                $value = '<a href="' . esc_url($file_url) . '" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">' . esc_html($value) . '</a>';
             } else {
                 $value = 'No file uploaded';
             }
