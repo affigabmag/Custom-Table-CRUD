@@ -101,6 +101,7 @@
 
                 } else {
                     fieldsText += ` field${fieldIndex}="fieldname=${fieldname};displayname=${displayname};displaytype=${displaytype}${readonly}"`;
+                    console.log(`Added field${fieldIndex} with type ${displaytype}`);
                 }
                 fieldIndex++;
             }

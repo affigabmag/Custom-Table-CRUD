@@ -174,6 +174,7 @@ class Ajax_Handler {
                 'date', 
                 'datetime', 
                 'email', 
+                'file', // Added file type here
                 'key-value', 
                 'number', 
                 'password', 
