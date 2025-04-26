@@ -354,6 +354,91 @@ class Table_Manager {
                         $has_error = true;
                     }
                 }
+
+                    // First, process form fields
+                    foreach ($columns as $field => $meta) {
+                        // Skip if field is not present in form data
+                        if (!isset($_POST[$field])) {
+                            continue;
+                        }
+                        
+                        $raw = isset($_POST[$field]) ? stripslashes($_POST[$field]) : '';
+                                        
+                        // Sanitize based on field type
+                        if ($meta['type'] === 'textarea') {
+                            $value = sanitize_textarea_field($raw);
+                        } elseif ($meta['type'] === 'email') {
+                            $value = sanitize_email($raw);
+                        } elseif ($meta['type'] === 'url') {
+                            $value = esc_url_raw($raw);
+                        } elseif ($meta['type'] === 'number') {
+                            $value = is_numeric($raw) ? $raw : '';
+                        } else {
+                            $value = sanitize_text_field($raw);
+                        }
+                        
+                        $data[$field] = $value;
+                    }
+
+                    // Process file uploads
+                    foreach ($columns as $field => $meta) {
+                        if ($meta['type'] === 'file' && isset($_FILES[$field]) && !empty($_FILES[$field]['name'])) {
+                            // Create upload directory if it doesn't exist
+                            $upload_dir = wp_upload_dir();
+                            $crud_dir = $upload_dir['basedir'] . '/crud-files';
+                            if (!file_exists($crud_dir)) {
+                                wp_mkdir_p($crud_dir);
+                            }
+                            
+                            // Create log file for debugging
+                            $log_file = WP_CONTENT_DIR . '/plugins/Custom-Table-CRUD/debug/file_upload_debug.log';
+                            $debug_dir = dirname($log_file);
+                            if (!file_exists($debug_dir)) {
+                                wp_mkdir_p($debug_dir);
+                            }
+                            
+                            // Log original file info
+                            $timestamp = date('Y-m-d H:i:s');
+                            $log_data = "\n==== [$timestamp] File Upload ====\n";
+                            $log_data .= "Original file: " . print_r($_FILES[$field], true) . "\n";
+                            file_put_contents($log_file, $log_data, FILE_APPEND);
+                            
+                            // Generate unique filename
+                            $original_filename = $_FILES[$field]['name'];
+                            $unique_filename = wp_unique_filename($crud_dir, $original_filename);
+                            
+                            file_put_contents($log_file, "Original filename: $original_filename\n", FILE_APPEND);
+                            file_put_contents($log_file, "Unique filename: $unique_filename\n", FILE_APPEND);
+                            
+                            // Move uploaded file
+                            $uploaded_file = $crud_dir . '/' . $unique_filename;
+                            if (move_uploaded_file($_FILES[$field]['tmp_name'], $uploaded_file)) {
+                                // Store the complete filename in the database
+                                $data[$field] = $unique_filename;
+                                file_put_contents($log_file, "File moved successfully. Database value: $unique_filename\n", FILE_APPEND);
+                            } else {
+                                file_put_contents($log_file, "File upload failed\n", FILE_APPEND);
+                            }
+                        }
+                    }
+
+                    // Create format array AFTER all data is processed
+                    $format = [];
+                    foreach ($data as $field => $value) {
+                        if (isset($columns[$field]) && $columns[$field]['type'] === 'number') {
+                            $format[] = strpos($value, '.') !== false ? '%f' : '%d';
+                        } else {
+                            $format[] = '%s';
+                        }
+                    }
+
+                    // Check for required fields
+                    $has_error = false;
+                    foreach ($columns as $field => $meta) {
+                        if (isset($data[$field]) && $data[$field] === '' && (!isset($meta['readonly']) || $meta['readonly'] !== 'true')) {
+                            $has_error = true;
+                        }
+                    }
                 
                 if ($has_error) {
                     $error_message = __('All fields are required.', 'custom-table-crud');
@@ -508,6 +593,27 @@ class Table_Manager {
         return ob_get_clean();
     }
     
+    private function get_upload_error_message($error_code) {
+        switch ($error_code) {
+            case UPLOAD_ERR_INI_SIZE:
+                return 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form';
+            case UPLOAD_ERR_PARTIAL:
+                return 'The uploaded file was only partially uploaded';
+            case UPLOAD_ERR_NO_FILE:
+                return 'No file was uploaded';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Missing a temporary folder';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Failed to write file to disk';
+            case UPLOAD_ERR_EXTENSION:
+                return 'A PHP extension stopped the file upload';
+            default:
+                return 'Unknown upload error';
+        }
+    }
+
 /**
  * Render a single table row
  *
@@ -524,15 +630,42 @@ public function render_table_row($row, $columns, $primary_key, $showedit = 'true
     
     $display_fields = array_keys($columns);
     
+    // Add debug logging
+    $log_file = WP_CONTENT_DIR . '/plugins/Custom-Table-CRUD/debug/table_view_debug.log';
+    $debug_dir = dirname($log_file);
+    if (!file_exists($debug_dir)) {
+        wp_mkdir_p($debug_dir);
+    }
+    
+    $timestamp = date('Y-m-d H:i:s');
+    $log_data = "\n==== [$timestamp] ====\n";
+    $log_data .= "Row: " . print_r($row, true) . "\n";
+    $log_data .= "Columns: " . print_r($columns, true) . "\n";
+    file_put_contents($log_file, $log_data, FILE_APPEND);
+    
     // Loop through selected fields
     foreach ($display_fields as $field) {
         $value = isset($row->$field) ? stripslashes($row->$field) : '';
 
         $type = isset($columns[$field]['type']) ? $columns[$field]['type'] : 'text';
         
+        // Log field processing
+        $field_log = "Processing field: $field, Type: $type, Value: $value\n";
+        file_put_contents($log_file, $field_log, FILE_APPEND);
+        
         // Format output based on field type
         if ($type === 'url' && !empty($value)) {
             $value = '<a href="' . esc_url($value) . '" target="_blank" rel="noopener noreferrer">' . esc_html($value) . '</a>';
+        } elseif ($type === 'file') {
+            // Handle file type fields, even if value is 0 or empty
+            if ($value !== '' && $value !== null) {
+                $upload_dir = wp_upload_dir();
+                $file_url = $upload_dir['baseurl'] . '/crud-files/' . $value;
+                // $value = '<a href="' . esc_url($file_url) . '" target="_blank" rel="noopener noreferrer">View File: ' . esc_html($value) . '</a>';
+                $value = '<a href="' . esc_url($file_url) . '" target="_blank" rel="noopener noreferrer">View File: ' . esc_html($value) . '</a>';
+            } else {
+                $value = 'No file uploaded';
+            }
         } elseif ($type === 'textarea') {
             $value = nl2br(esc_html($value));
         } else {
@@ -579,6 +712,7 @@ public function render_table_row($row, $columns, $primary_key, $showedit = 'true
     }
     
     $output .= '</tr>';
+    file_put_contents($log_file, "Final row output: " . htmlspecialchars($output) . "\n", FILE_APPEND);
     return $output;
 }
     

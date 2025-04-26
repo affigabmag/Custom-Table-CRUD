@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
-<form method="post" class="custom-table-crud-form">
+<form method="post" class="custom-table-crud-form" enctype="multipart/form-data">
     <input type="hidden" name="form_type" value="data_form">
     <?php wp_nonce_field('crud_form_nonce', 'crud_nonce'); ?>
     
@@ -104,7 +104,19 @@ if (!defined('ABSPATH')) {
                 <textarea name="<?php echo esc_attr($field); ?>" 
                     rows="3" 
                     required><?php echo esc_textarea($value); ?></textarea>
-            
+
+            <?php elseif ($type === 'file'): ?>
+                <input type="file" 
+                    name="<?php echo esc_attr($field); ?>" 
+                    id="<?php echo esc_attr($field); ?>"
+                    <?php echo $readonly ? 'disabled' : ''; ?>>
+                
+                <?php if (!empty($value)): ?>
+                    <div class="current-file">
+                        <p>Current file: <a href="<?php echo esc_url(content_url('/uploads/crud-files/' . esc_attr($value))); ?>" target="_blank"><?php echo esc_html($value); ?></a></p>
+                    </div>
+                <?php endif; ?>
+                    
             <?php elseif ($type === 'checkbox'): ?>
                 <input type="checkbox" 
                     name="<?php echo esc_attr($field); ?>" 
